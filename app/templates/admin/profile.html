@@ -22,7 +22,7 @@
             <div class="portfolio-photo">
               <img id="photo-preview" src="{{ prof.photo_url }}" alt="Фото галереи">
               <div class="portfolio-photo-controls">
-                <input class="form-control{% if errors.photo %} is-invalid{% endif %}" type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp">
+                <input class="form-control{% if errors.photo %} is-invalid{% endif %}" type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp,.heic,.heif">
                 {% if errors.photo %}<div class="invalid-feedback">{{ errors.photo }}</div>{% endif %}
                 <small class="text-muted">Лучше вертикальное фото: картины в интерьере, шоурум или мастерская. Показывается на главной и на странице «О галерее».</small>
                 {% if prof.photo %}

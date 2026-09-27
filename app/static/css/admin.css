@@ -33,3 +33,4 @@
 .portfolio-photo { display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
 .portfolio-photo img { width: 150px; aspect-ratio: 6 / 7; object-fit: cover; border-radius: 10px; background: #e3ece8; border: 1px solid #e6e7e9; }
 .portfolio-photo-controls { flex: 1; min-width: 240px; display: grid; gap: 6px; }
+.dz-heic { aspect-ratio: 4 / 3; display: grid; place-items: center; padding: 6px; border-radius: 6px; background: #eef1f5; color: #49505a; font-size: 11px; text-align: center; word-break: break-all; }

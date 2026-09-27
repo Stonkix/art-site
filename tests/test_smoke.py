@@ -210,3 +210,20 @@ def test_admin_password_change(client):
 
         login_guard.reset()
     _login(client)
+
+
+def test_heic_upload(client):
+    """Фото с iPhone (HEIC) принимаются и конвертируются в WebP."""
+    _login(client)
+    buf = BytesIO()
+    Image.new("RGB", (1600, 1200), "purple").save(buf, "HEIF")
+    data = {"title": "С айфона", "technique": "oil", "genre": "flowers", "width_cm": "30", "height_cm": "40",
+            "status": "available", "is_published": "y", "save": "Сохранить"}
+    r = client.post("/admin/painting/create", data=data, follow_redirects=False,
+                    files=[("photos_upload", ("IMG_0001.HEIC", buf.getvalue(), "image/heic"))])
+    assert r.status_code == 302
+    with SessionLocal() as db:
+        p = db.query(Painting).filter_by(title="С айфона").one()
+        assert len(p.photos) == 1
+        ph = p.photos[0]
+    assert Image.open(images.painting_dir(p.id) / f"{ph.name}_full.webp").format == "WEBP"

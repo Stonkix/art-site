@@ -99,12 +99,16 @@ class PaintingAdmin(ModelView, model=Painting):
     column_sortable_list = [Painting.id, Painting.price, Painting.created_at]
     column_default_sort = [(Painting.id, True)]
     column_formatters = {
+        # превью и название в одном блоке с минимальной шириной — текст не наезжает на соседние колонки
         Painting.title: lambda m, a: Markup(
-            '<img src="{}" style="height:48px;width:48px;object-fit:contain;background:#f3f1ec;border-radius:4px;'
-            'margin-right:8px;vertical-align:middle">{}'.format(m.cover.thumb, escape(m.title))
-            if m.cover
-            else escape(m.title)
+            '<span style="display:inline-flex;align-items:center;gap:10px;min-width:220px;white-space:normal">'
+            '{}<span>{}</span></span>'.format(
+                '<img src="{}" style="height:48px;width:48px;flex:none;object-fit:contain;background:#f3f1ec;'
+                'border-radius:4px">'.format(m.cover.thumb) if m.cover else "",
+                escape(m.title),
+            )
         ),
+        Painting.created_at: lambda m, a: f"{m.created_at:%d.%m.%Y %H:%M}" if m.created_at else "",
         Painting.technique: lambda m, a: m.technique_name,
         Painting.status: lambda m, a: STATUSES.get(m.status, m.status),
         Painting.price: lambda m, a: fmt_price(m.price) if m.price else "по запросу",
@@ -116,15 +120,15 @@ class PaintingAdmin(ModelView, model=Painting):
     }
     column_labels = {
         Painting.title: "Название",
-        Painting.author: "Автор (необязательно)",
+        Painting.author: "Автор",
         Painting.technique: "Техника",
         Painting.genre: "Жанр",
-        Painting.base: "Основа (холст на подрамнике, картон, бумага…)",
+        Painting.base: "Основа",
         Painting.width_cm: "Ширина, см",
         Painting.height_cm: "Высота, см",
         Painting.year: "Год",
         Painting.framed: "В раме",
-        Painting.price: "Цена, ₽ (пусто — «по запросу»)",
+        Painting.price: "Цена, ₽",
         Painting.status: "Статус",
         Painting.description: "Описание",
         Painting.is_featured: "На главную",
@@ -146,6 +150,10 @@ class PaintingAdmin(ModelView, model=Painting):
             "description": "Проданные картины уходят из каталога, но остаются на странице «О галерее» в блоке «Уже нашли дом».",
         },
         "description": {"show_chars_count": False},
+        # подсказки — только в форме; в таблице заголовки короткие
+        "author": {"description": "Необязательно. Если пусто — на сайте не показывается."},
+        "base": {"description": "Например: холст на подрамнике, картон, бумага."},
+        "price": {"description": "Пусто — на сайте будет «Цена по запросу»."},
     }
     form_widget_args = {"description": {"rows": 8}}
 
@@ -153,7 +161,7 @@ class PaintingAdmin(ModelView, model=Painting):
         form_class = await super().scaffold_form(rules)
         form_class.photos_upload = MultipleFileField(
             "Фото",
-            render_kw={"accept": "image/*", "multiple": True},
+            render_kw={"accept": "image/*,.heic,.heif", "multiple": True},
         )
         return form_class
 

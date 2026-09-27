@@ -6,8 +6,11 @@ from io import BytesIO
 from pathlib import Path
 
 from PIL import Image, ImageOps
+from pillow_heif import register_heif_opener
 
 from app.config import settings
+
+register_heif_opener()  # фото с iPhone в формате HEIC/HEIF открываются как обычные картинки
 
 WEBP_SIZES = {"thumb": 900, "full": 2200}  # максимальная сторона, px; full — для рассматривания мазков
 WEBP_QUALITY = 84  # картинам нужна чуть выше обычного: на градиентах видны артефакты сжатия

@@ -5,7 +5,10 @@
   // ---------- Drag-n-drop фото ----------
   const input = document.getElementById("photos_upload");
   if (input) {
-    const ACCEPT = ["image/jpeg", "image/png", "image/webp"];
+    const ACCEPT = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+    // HEIC с iPhone: на Windows браузер часто не знает тип файла, поэтому смотрим и на расширение
+    const isHeic = (f) => /\.(heic|heif)$/i.test(f.name) || /image\/hei[cf]/.test(f.type);
+    const isAccepted = (f) => ACCEPT.includes(f.type) || isHeic(f);
     const picked = new DataTransfer(); // накапливаем файлы из нескольких перетаскиваний
     const existing = document.getElementById("existing-photos");
 
@@ -16,7 +19,7 @@
       ${existing ? `<div class="dz-existing"><div class="dz-caption">Загруженные фото: перетащите, чтобы поменять порядок (первое — главное), × — удалить. Изменения применятся после «Сохранить».</div><div class="dz-grid">${existing.innerHTML}</div></div>` : ""}
       <div class="dz-hint">
         <strong>Перетащите фото сюда</strong> или нажмите, чтобы выбрать
-        <small>JPG, PNG, WebP · можно сразу несколько · сожмутся автоматически</small>
+        <small>JPG, PNG, WebP, HEIC · можно сразу несколько · сожмутся автоматически</small>
       </div>
       <div class="dz-grid dz-new"></div>`;
     input.hidden = true;
@@ -83,10 +86,18 @@
       [...picked.files].forEach((file, i) => {
         const item = document.createElement("div");
         item.className = "dz-item";
-        const img = document.createElement("img");
-        img.src = URL.createObjectURL(file);
-        img.onload = () => URL.revokeObjectURL(img.src);
-        img.alt = file.name;
+        let img;
+        if (isHeic(file)) {
+          // браузеры (кроме Safari) не показывают HEIC — вместо превью плитка с именем, сервер всё сконвертирует
+          img = document.createElement("div");
+          img.className = "dz-heic";
+          img.textContent = file.name;
+        } else {
+          img = document.createElement("img");
+          img.src = URL.createObjectURL(file);
+          img.onload = () => URL.revokeObjectURL(img.src);
+          img.alt = file.name;
+        }
         const remove = document.createElement("button");
         remove.type = "button";
         remove.className = "dz-remove";
@@ -109,7 +120,7 @@
     const add = (files) => {
       const skipped = [];
       for (const f of files) {
-        if (!ACCEPT.includes(f.type)) { skipped.push(f.name); continue; }
+        if (!isAccepted(f)) { skipped.push(f.name); continue; }
         const dup = [...picked.files].some((x) => x.name === f.name && x.size === f.size);
         if (!dup) picked.items.add(f);
       }
