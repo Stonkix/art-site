@@ -131,6 +131,11 @@
     lbImg.addEventListener("mousemove", (e) => {
       if (lbImg.classList.contains("is-zoomed")) setOrigin(e);
     });
+    lbImg.addEventListener("touchmove", (e) => {
+      if (!lbImg.classList.contains("is-zoomed")) return;
+      e.preventDefault();
+      setOrigin(e.touches[0]);
+    }, { passive: false });
     lightbox.addEventListener("close", () => lbImg.classList.remove("is-zoomed"));
 
     let touchX = null;

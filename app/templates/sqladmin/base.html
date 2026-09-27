@@ -1,0 +1,6 @@
+{# Общая основа всех страниц панели: подключаем свои стили (в т.ч. для телефона) #}
+{% extends "sqladmin_original/base.html" %}
+{% block head_css %}
+{{ super() }}
+<link rel="stylesheet" href="/static/css/admin.css?v={{ static_v }}">
+{% endblock %}

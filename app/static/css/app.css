@@ -318,3 +318,17 @@ dialog::backdrop { background: rgb(34 32 28 / 55%); backdrop-filter: blur(2px); 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Телефон ---------- */
+.header-call { display: none; place-items: center; width: 44px; height: 44px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+@media (max-width: 980px) { .header-call { display: grid; } }
+@media (max-width: 560px) {
+  .hero-cta .btn { flex: 1 1 100%; }
+  .hero-art .art-wall { aspect-ratio: 1 / 1; padding: 8%; }
+  .art-wall { padding: 9%; }
+  .art-view .art-wall { padding: 6%; }
+  .section-head { flex-wrap: wrap; }
+  .art-actions-row { grid-template-columns: 1fr; }
+  .lead-dialog { padding: 24px 18px; }
+}
+.lb-img.is-zoomed { touch-action: none; }  /* в увеличенном виде палец двигает картину, а не страницу */

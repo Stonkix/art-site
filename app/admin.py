@@ -290,7 +290,7 @@ class LeadAdmin(ModelView, model=Lead):
         Lead.painting: "Картина",
         Lead.is_processed: "Обработана",
     }
-    column_formatters = {Lead.kind: lambda m, a: LEAD_KINDS.get(m.kind, m.kind)}
+    column_formatters = {Lead.kind: lambda m, a: LEAD_KINDS.get(m.kind, m.kind), Lead.created_at: lambda m, a: f"{m.created_at:%d.%m.%Y %H:%M}" if m.created_at else ""}
     column_formatters_detail = column_formatters
     form_columns = [Lead.is_processed, Lead.message]
     form_args = {"message": {"show_chars_count": False}}

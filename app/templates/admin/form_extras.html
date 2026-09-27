@@ -1,6 +1,5 @@
 {# Drag-n-drop фото, порядок и удаление уже загруженных — только в форме картины #}
 {% if model_view.identity == "painting" %}
-<link rel="stylesheet" href="/static/css/admin.css?v={{ static_v }}">
 {% if obj is defined and obj.photos %}
 <template id="existing-photos">
   {% for ph in obj.photos %}
