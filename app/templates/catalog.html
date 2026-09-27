@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}{% if f.genre %}{{ GENRES[f.genre] }} — картины{% else %}Картины в наличии{% endif %} — {{ settings.artist_name }}{% endblock %}
+{% block canonical %}{{ settings.base_url }}/catalog{% endblock %}
+
+{% block content %}
+<div class="container page-head">
+  <nav class="crumbs" aria-label="Навигация"><a href="/">Главная</a><span>/</span>Картины</nav>
+  <h1>Картины</h1>
+</div>
+
+<div class="container">
+  <form id="filters" class="filters" action="/catalog" method="get"
+        hx-get="/catalog" hx-target="#results" hx-push-url="true" hx-indicator="#results"
+        hx-trigger="change, submit, input delay:700ms from:.js-money">
+    <label class="field">
+      <span>Техника</span>
+      <select name="technique">
+        <option value="">Любая</option>
+        {% for code, label in TECHNIQUES.items() %}<option value="{{ code }}" {% if f.technique == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="field">
+      <span>Жанр</span>
+      <select name="genre">
+        <option value="">Любой</option>
+        {% for code, label in GENRES.items() %}<option value="{{ code }}" {% if f.genre == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="field">
+      <span>Размер</span>
+      <select name="size">
+        <option value="">Любой</option>
+        {% for code, (label, _, _) in SIZE_GROUPS.items() %}<option value="{{ code }}" {% if f.size == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="field">
+      <span>Бюджет до, ₽</span>
+      <input name="price_max" class="js-money" inputmode="numeric" placeholder="Любой" value="{{ f.price_max|money }}">
+    </label>
+    <label class="field">
+      <span>Сортировка</span>
+      <select name="sort">
+        {% for code, (label, _) in sorts.items() %}<option value="{{ code }}" {% if f.sort == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+    </label>
+    <label class="check">
+      <input type="checkbox" name="sold" value="1" {% if f.sold %}checked{% endif %}>
+      <span>Показать проданные</span>
+    </label>
+    <noscript><button class="btn btn-primary" type="submit">Показать</button></noscript>
+  </form>
+
+  <div id="results" aria-live="polite">
+    {% include "partials/catalog_results.html" %}
+  </div>
+</div>
+<div class="section" style="padding-top:0"></div>
+{% endblock %}

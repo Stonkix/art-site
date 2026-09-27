@@ -1,0 +1,63 @@
+{% extends "sqladmin/layout.html" %}
+{% block content %}
+<link rel="stylesheet" href="/static/css/admin.css?v={{ static_v }}">
+<div class="col-12">
+  <div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h3 class="card-title">Об авторе</h3>
+      <a href="/about" target="_blank" rel="noopener">Посмотреть на сайте →</a>
+    </div>
+    <div class="card-body">
+      {% if saved %}
+      <div class="alert alert-success" role="status">Сохранено. На сайте обновится в течение нескольких секунд.</div>
+      {% endif %}
+      {% if errors %}
+      <div class="alert alert-danger" role="alert">Исправьте поля, отмеченные красным.</div>
+      {% endif %}
+
+      <form method="post" enctype="multipart/form-data">
+        <div class="mb-3 row">
+          <label class="col-sm-2 col-form-label" for="photo">Фото автора</label>
+          <div class="col-sm-10">
+            <div class="portfolio-photo">
+              <img id="photo-preview" src="{{ prof.photo_url }}" alt="Фото автора">
+              <div class="portfolio-photo-controls">
+                <input class="form-control{% if errors.photo %} is-invalid{% endif %}" type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp">
+                {% if errors.photo %}<div class="invalid-feedback">{{ errors.photo }}</div>{% endif %}
+                <small class="text-muted">Лучше вертикальное фото — в мастерской или за работой. Показывается на главной и на странице «Об авторе».</small>
+                {% if prof.photo %}
+                <label class="form-check mt-2">
+                  <input class="form-check-input" type="checkbox" name="photo_remove" value="1">
+                  <span class="form-check-label">Убрать фото (вернётся заглушка)</span>
+                </label>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3 row">
+          <label class="col-sm-2 col-form-label" for="about">О себе</label>
+          <div class="col-sm-10">
+            <textarea class="form-control{% if errors.about %} is-invalid{% endif %}" id="about" name="about" rows="10">{{ values.about }}</textarea>
+            {% if errors.about %}<div class="invalid-feedback">{{ errors.about }}</div>{% endif %}
+            <small class="text-muted">Пустая строка между абзацами — новый абзац. Первый абзац на сайте выделяется крупнее.</small>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-10 offset-sm-2">
+            <button class="btn btn-primary" type="submit">Сохранить</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  document.getElementById("photo").addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) document.getElementById("photo-preview").src = URL.createObjectURL(file);
+  });
+</script>
+{% endblock %}

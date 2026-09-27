@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Страница не найдена — {{ settings.site_name }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<section class="container narrow status-page">
+  <p class="status-code">404</p>
+  <h1>Такой страницы нет</h1>
+  <p class="lead">Возможно, ссылка устарела или картина снята с публикации.</p>
+  <a class="btn btn-primary" href="/catalog">Смотреть картины</a>
+</section>
+{% endblock %}

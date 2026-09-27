@@ -1,0 +1,26 @@
+{# Контекст: kind, painting_id?, show_message?, button_text?, message_label?, message_placeholder? + name/phone/message/error при повторном показе #}
+<form class="lead-form" action="/lead" method="post" hx-post="/lead" hx-swap="outerHTML" hx-disabled-elt="find button">
+  <input type="hidden" name="kind" value="{{ kind|default('callback') }}">
+  {% if painting_id %}<input type="hidden" name="painting_id" value="{{ painting_id }}">{% endif %}
+  <label class="field">
+    <span>Как к вам обращаться</span>
+    <input name="name" required maxlength="100" autocomplete="name" value="{{ name|default('') }}">
+  </label>
+  <label class="field">
+    <span>Телефон</span>
+    <input name="phone" type="tel" required inputmode="tel" autocomplete="tel" placeholder="+7 900 000-00-00" value="{{ phone|default('') }}">
+  </label>
+  {% if show_message or message %}
+  <label class="field">
+    <span>{{ message_label|default('Сообщение') }} <em>— необязательно</em></span>
+    <textarea name="message" rows="3" maxlength="2000" placeholder="{{ message_placeholder|default('') }}">{{ message|default('') }}</textarea>
+  </label>
+  {% endif %}
+  <div class="hp" aria-hidden="true"><label>Сайт <input name="website" tabindex="-1" autocomplete="off"></label></div>
+  <label class="consent">
+    <input type="checkbox" name="consent" value="true" required>
+    <span>Даю <a href="/consent" target="_blank">согласие на обработку персональных данных</a></span>
+  </label>
+  {% if error %}<p class="form-error" role="alert">{{ error }}</p>{% endif %}
+  <button class="btn btn-primary btn-block" type="submit">{{ button_text|default('Отправить') }}</button>
+</form>

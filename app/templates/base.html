@@ -1,0 +1,105 @@
+{% from "partials/icons.html" import icon %}<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% set page_title %}{% block title %}{{ settings.artist_name }} — авторские картины, купить оригинал{% endblock %}{% endset %}
+  {% set page_description %}{% block description %}Оригинальные картины {{ settings.artist_name }}: пейзажи, цветы, натюрморты. Каждая работа в единственном экземпляре, доставка по России, картины на заказ.{% endblock %}{% endset %}
+  <title>{{ page_title }}</title>
+  <meta name="description" content="{{ page_description|trim }}">
+  <link rel="canonical" href="{% block canonical %}{{ settings.base_url }}{{ request.url.path }}{% endblock %}">
+
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+  <meta property="og:site_name" content="{{ settings.site_name }}">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="{% block og_title %}{{ page_title|trim }}{% endblock %}">
+  <meta property="og:description" content="{% block og_description %}{{ page_description|trim }}{% endblock %}">
+  <meta property="og:url" content="{{ settings.base_url }}{{ request.url.path }}">
+  {% block og_image %}{% endblock %}
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="/static/img/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#faf8f4">
+  <link rel="preload" href="/static/fonts/cormorant-cyrillic-500.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/css/app.css?v={{ static_v }}">
+  {% block head %}{% endblock %}
+  <script src="/static/vendor/htmx.min.js" defer></script>
+  <script src="/static/js/app.js?v={{ static_v }}" defer></script>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+  <a class="skip" href="#main">К содержимому</a>
+  <header class="site-header">
+    <div class="container header-row">
+      <a class="logo" href="/">
+        <strong>{{ settings.artist_name }}</strong>
+        <small>{{ settings.artist_title }}</small>
+      </a>
+      <nav class="main-nav" id="main-nav" aria-label="Основное меню">
+        {% set path = request.url.path %}
+        <a href="/catalog" {% if path.startswith('/catalog') %}aria-current="page"{% endif %}>Картины</a>
+        <a href="/how-to-buy" {% if path == '/how-to-buy' %}aria-current="page"{% endif %}>Покупка и доставка</a>
+        <a href="/about" {% if path == '/about' %}aria-current="page"{% endif %}>Об авторе и контакты</a>
+        <a class="nav-phone" href="{{ settings.phone_href }}">{{ settings.phone }}</a>
+      </nav>
+      <div class="header-actions">
+        <a class="header-phone" href="{{ settings.phone_href }}">{{ settings.phone }}</a>
+        <button class="btn btn-ghost btn-sm" data-lead="callback" type="button">Связаться</button>
+        <button class="burger" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Меню">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div>
+        <div class="footer-name">{{ settings.artist_name }}</div>
+        <p class="muted">{{ settings.artist_title }}, {{ settings.city }}.<br>{{ settings.legal_info }}</p>
+      </div>
+      <div>
+        <div class="footer-h">Разделы</div>
+        <a href="/catalog">Картины в наличии</a>
+        <a href="/how-to-buy">Покупка и доставка</a>
+        <a href="/how-to-buy#commission">Картина на заказ</a>
+        <a href="/about">Об авторе</a>
+      </div>
+      <div>
+        <div class="footer-h">Связаться</div>
+        <a href="{{ settings.phone_href }}">{{ icon('phone') }}{{ settings.phone }}</a>
+        {% if settings.telegram %}<a href="https://t.me/{{ settings.telegram }}" target="_blank" rel="noopener">{{ icon('telegram') }}Telegram</a>{% endif %}
+        {% if settings.max_url %}<a href="{{ settings.max_url }}" target="_blank" rel="noopener">{{ icon('max') }}Max</a>{% endif %}
+        <a href="mailto:{{ settings.email }}">{{ icon('mail') }}{{ settings.email }}</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <span>© {{ now().year }} {{ settings.artist_name }}. Изображения картин защищены авторским правом.</span>
+      <span><a href="/privacy" style="display:inline">Политика конфиденциальности</a></span>
+    </div>
+  </footer>
+
+  <dialog class="lead-dialog" id="lead-dialog" aria-labelledby="lead-dialog-title">
+    <button class="dialog-close" type="button" data-close aria-label="Закрыть">×</button>
+    <h2 id="lead-dialog-title">Оставьте заявку</h2>
+    <p class="muted" id="lead-dialog-sub">Отвечу в течение дня. Если удобнее — позвоните: {{ settings.phone }}.</p>
+    <div id="lead-dialog-body"></div>
+  </dialog>
+  <template id="lead-form-tpl">
+    {% with kind="callback", show_message=True %}{% include "partials/lead_form.html" %}{% endwith %}
+  </template>
+
+  {% block scripts %}{% endblock %}
+  {% if settings.yandex_metrika_id %}
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");
+    ym({{ settings.yandex_metrika_id|int }}, "init", {clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:true});
+  </script>
+  {% endif %}
+</body>
+</html>

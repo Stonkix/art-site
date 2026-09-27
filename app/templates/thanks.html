@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Заявка отправлена — {{ settings.site_name }}{% endblock %}
+{% block head %}<meta name="robots" content="noindex">{% endblock %}
+
+{% block content %}
+<section class="container narrow status-page">
+  {% include "partials/lead_success.html" %}
+  <a class="btn btn-primary" href="/catalog">Смотреть картины</a>
+</section>
+{% endblock %}

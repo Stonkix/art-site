@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Покупка, оплата и доставка картин — {{ settings.artist_name }}{% endblock %}
+{% block description %}Как купить картину {{ settings.artist_name }}: заявка, оплата, упаковка и доставка по России, сертификат подлинности, картины на заказ.{% endblock %}
+
+{% block content %}
+<div class="container page-head">
+  <nav class="crumbs" aria-label="Навигация"><a href="/">Главная</a><span>/</span>Покупка и доставка</nav>
+  <h1>Покупка и доставка</h1>
+  <p class="lead" style="max-width:640px">Всё просто: выбираете картину, мы договариваемся об оплате и доставке, вы получаете работу с сертификатом подлинности.</p>
+</div>
+
+<section class="section" style="padding-top:32px">
+  <div class="container">
+    <h2>Как купить</h2>
+    <ol class="steps">
+      <li><strong>Выберите картину</strong><span>В каталоге или напишите, что ищете, — подберу из готовых работ.</span></li>
+      <li><strong>Оставьте заявку</strong><span>Кнопка «Хочу эту картину» на странице работы, звонок или сообщение. Картину забронирую за вами.</span></li>
+      <li><strong>Оплата</strong><span>Переводом по реквизитам с чеком самозанятого. Для доставки по России — после отправки фото упакованной картины.</span></li>
+      <li><strong>Получение</strong><span>Лично в мастерской, курьером по городу или транспортной компанией по России.</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="section section-wall">
+  <div class="container info-grid">
+    <div class="info-block">
+      <h3>Доставка</h3>
+      <ul>
+        <li>{{ settings.city }} — бесплатно, привезу и помогу повесить</li>
+        <li>По России — СДЭК или Почтой, 2–7 дней</li>
+        <li>Стоимость доставки по тарифу перевозчика, отправление застраховано на полную стоимость</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h3>Упаковка</h3>
+      <ul>
+        <li>Защитная бумага по красочному слою</li>
+        <li>Уголки, пузырчатая плёнка и жёсткий короб</li>
+        <li>Перед отправкой пришлю фото упакованной картины</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h3>Что вы получите</h3>
+      <ul>
+        <li>Оригинал, подписанный автором</li>
+        <li>Сертификат подлинности с фото и описанием работы</li>
+        <li>Готовность к развеске: крепление установлено</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="commission">
+  <div class="container split">
+    <div>
+      <p class="eyebrow">Картина на заказ</p>
+      <h2>Как проходит работа над заказом</h2>
+      <ol class="steps" style="grid-template-columns:1fr;gap:18px;margin-top:20px">
+        <li><strong>Обсуждаем идею</strong><span>Сюжет, размер, цвета, срок. Можно прислать фото интерьера или референсы.</span></li>
+        <li><strong>Эскиз и предоплата</strong><span>Согласуем эскиз, после этого — предоплата. Если эскиз не понравился, ничего не платите.</span></li>
+        <li><strong>Пишу картину</strong><span>Присылаю фото на промежуточных этапах. Обычно 2–4 недели, зависит от размера.</span></li>
+        <li><strong>Готово</strong><span>Остаток оплаты и доставка — так же, как для картин из каталога.</span></li>
+      </ol>
+    </div>
+    <div class="panel">
+      <h3>Обсудить заказ</h3>
+      {% with kind="commission", show_message=True, message_label="Идея, размер, сроки", message_placeholder="Например: пейзаж с рекой, 60×80, к декабрю", button_text="Отправить" %}
+        {% include "partials/lead_form.html" %}
+      {% endwith %}
+    </div>
+  </div>
+</section>
+{% endblock %}

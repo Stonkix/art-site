@@ -1,0 +1,24 @@
+# /etc/systemd/system/artsite.service
+# Второй сайт на сервере: свой порт (8001), свой пользователь, свои база и фото.
+[Unit]
+Description=Art site (FastAPI)
+After=network.target
+
+[Service]
+User=artsite
+Group=artsite
+WorkingDirectory=/srv/artsite
+ExecStart=/srv/artsite/.venv/bin/uvicorn app.main:app \
+    --host 127.0.0.1 --port 8001 --workers 1 \
+    --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=always
+RestartSec=3
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/artsite/data /srv/artsite/media
+
+[Install]
+WantedBy=multi-user.target

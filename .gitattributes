@@ -1,0 +1,5 @@
+# Храним и отдаём текст с LF: скрипты и конфиги для Linux-сервера ломаются от CRLF
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.webp binary

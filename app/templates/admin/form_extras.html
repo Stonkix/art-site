@@ -1,0 +1,15 @@
+{# Drag-n-drop фото, порядок и удаление уже загруженных — только в форме картины #}
+{% if model_view.identity == "painting" %}
+<link rel="stylesheet" href="/static/css/admin.css?v={{ static_v }}">
+{% if obj is defined and obj.photos %}
+<template id="existing-photos">
+  {% for ph in obj.photos %}
+  <div class="dz-item dz-photo" data-id="{{ ph.id }}" draggable="true">
+    <img src="{{ ph.thumb }}" alt="" draggable="false">
+    <button type="button" class="dz-remove" title="Удалить фото">×</button>
+  </div>
+  {% endfor %}
+</template>
+{% endif %}
+<script src="/static/js/admin.js?v={{ static_v }}"></script>
+{% endif %}

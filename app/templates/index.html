@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block og_image %}{% if hero and hero.cover %}<meta property="og:image" content="{{ settings.base_url }}{{ hero.cover.og }}">
+  <meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">{% endif %}{% endblock %}
+
+{% block head %}
+<script type="application/ld+json">{{ {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": settings.artist_name,
+  "jobTitle": settings.artist_title,
+  "url": settings.base_url,
+  "telephone": settings.phone,
+  "email": settings.email,
+  "address": {"@type": "PostalAddress", "addressLocality": settings.city, "addressCountry": "RU"}
+}|json_ld }}</script>
+{% endblock %}
+
+{% block content %}
+{% set pr = profile() %}
+<section class="hero">
+  <div class="container hero-grid">
+    <div>
+      <p class="eyebrow">{{ settings.artist_title }} · {{ settings.city }}</p>
+      <h1>Картины, которые хочется <em>рассматривать</em></h1>
+      <p class="lead">Оригинальные работы в единственном экземпляре — для дома, в подарок или в коллекцию. Помогу подобрать картину под интерьер и напишу на заказ.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary" href="/catalog">Смотреть картины{% if total %} · {{ total }}{% endif %}</a>
+        <button class="btn btn-ghost" type="button" data-lead="commission" data-title="Картина на заказ"
+                data-sub="Опишите идею, размер и сроки — отвечу, сколько это будет стоить.">Написать на заказ</button>
+      </div>
+    </div>
+    {% if hero %}
+    <figure class="hero-art">
+      <a class="art-wall" href="{{ hero.url }}" aria-label="{{ hero.title }}">
+        <img src="{{ hero.cover.full }}" alt="{{ hero.title }}" fetchpriority="high"
+             {% if hero.cover.width %}width="{{ hero.cover.width }}" height="{{ hero.cover.height }}"{% endif %}>
+      </a>
+      <figcaption>
+        <a href="{{ hero.url }}">«{{ hero.title }}»</a>
+        <span>{{ hero.medium }}, {{ hero.size_label }}</span>
+      </figcaption>
+    </figure>
+    {% endif %}
+  </div>
+</section>
+
+{% if featured %}
+<section class="section section-wall">
+  <div class="container">
+    <div class="section-head">
+      <h2>Избранные работы</h2>
+      <a class="link-arrow" href="/catalog">Все картины</a>
+    </div>
+    <div class="grid-art">{% for p in featured %}{% include "partials/card.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if newest %}
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Новые работы</h2>
+      <a class="link-arrow" href="/catalog">Весь каталог</a>
+    </div>
+    <div class="grid-art">{% for p in newest %}{% include "partials/card.html" %}{% endfor %}</div>
+    {% if genre_counts %}
+    <div class="genres" style="margin-top:48px">
+      {% for code, count in genre_counts %}
+      <a class="genre-link" href="/catalog?genre={{ code }}">{{ GENRES[code] }}<span>{{ count }}</span></a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}
+
+<section class="section section-wall">
+  <div class="container">
+    <h2>Почему покупают здесь</h2>
+    <div class="features">
+      <div class="feature">
+        <h3>Только оригиналы</h3>
+        <p>Каждая картина написана вручную и существует в единственном экземпляре. Никаких печатных копий.</p>
+      </div>
+      <div class="feature">
+        <h3>Сертификат подлинности</h3>
+        <p>К картине прилагается сертификат с фотографией работы, описанием и подписью автора.</p>
+      </div>
+      <div class="feature">
+        <h3>Бережная доставка</h3>
+        <p>Упаковываю в несколько слоёв и жёсткий короб. Отправляю по всей России, по городу — доставлю лично.</p>
+      </div>
+      <div class="feature">
+        <h3>Помогу выбрать</h3>
+        <p>Пришлю дополнительные фото и видео, покажу картину в вашем интерьере по фото комнаты.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="commission">
+  <div class="container split">
+    <div>
+      <p class="eyebrow">Картина на заказ</p>
+      <h2>Напишу картину специально для вас</h2>
+      <p class="lead">По вашей фотографии, под размер стены или в цветах интерьера. Сначала согласуем эскиз — работа начинается, только когда он вам нравится.</p>
+      <a class="link-arrow" href="/how-to-buy#commission">Как проходит работа над заказом</a>
+    </div>
+    <div class="panel">
+      {% with kind="commission", show_message=True, message_label="Идея, размер, сроки", message_placeholder="Например: пейзаж с рекой, 60×80, к декабрю", button_text="Обсудить заказ" %}
+        {% include "partials/lead_form.html" %}
+      {% endwith %}
+    </div>
+  </div>
+</section>
+
+<section class="section section-wall">
+  <div class="container author-teaser">
+    <img class="author-photo" src="{{ pr.photo_url }}" alt="{{ settings.artist_name }}" loading="lazy">
+    <div>
+      <p class="eyebrow">Об авторе</p>
+      <h2>{{ settings.artist_name }}</h2>
+      {% if pr.paragraphs %}<p class="lead">{{ pr.paragraphs[0] }}</p>{% endif %}
+      <a class="link-arrow" href="/about">Подробнее об авторе</a>
+    </div>
+  </div>
+</section>
+
+{% if reviews %}
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <h2>Отзывы покупателей</h2>
+      <a class="link-arrow" href="/about#reviews">Все отзывы</a>
+    </div>
+    <div class="reviews">{% for r in reviews %}{% include "partials/review.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

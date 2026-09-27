@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% from "partials/icons.html" import icon %}
+{% block title %}Об авторе и контакты — {{ settings.artist_name }}{% endblock %}
+
+{% block content %}
+{% set pr = profile() %}
+<div class="container page-head">
+  <nav class="crumbs" aria-label="Навигация"><a href="/">Главная</a><span>/</span>Об авторе</nav>
+</div>
+
+<section class="container about-hero">
+  <img class="author-photo" src="{{ pr.photo_url }}" alt="{{ settings.artist_name }}" width="480" height="600">
+  <div>
+    <p class="eyebrow">{{ settings.artist_title }}</p>
+    <h1>{{ settings.artist_name }}</h1>
+    {% for para in pr.paragraphs %}
+    <p{% if loop.first %} class="lead"{% endif %}>{{ para }}</p>
+    {% endfor %}
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="/catalog">Смотреть картины</a>
+      <a class="btn btn-ghost" href="#contacts">Контакты</a>
+    </div>
+  </div>
+</section>
+
+{% if sold %}
+<section class="section section-wall">
+  <div class="container">
+    <div class="section-head">
+      <h2>В частных коллекциях</h2>
+      <a class="link-arrow" href="/catalog?sold=1">Все работы</a>
+    </div>
+    <div class="grid-art">{% for p in sold %}{% include "partials/card.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+{% if reviews %}
+<section class="section" id="reviews">
+  <div class="container">
+    <h2>Отзывы покупателей</h2>
+    <div class="reviews" style="margin-top:32px">{% for r in reviews %}{% include "partials/review.html" %}{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section section-wall" id="contacts">
+  <div class="container">
+    <h2>Контакты</h2>
+    <div class="split" style="align-items:start;margin-top:32px">
+      <div>
+        <div class="contact-list">
+          <a class="contact-item" href="{{ settings.phone_href }}">{{ icon('phone', 22) }}<span><small>Телефон</small><strong>{{ settings.phone }}</strong></span></a>
+          {% if settings.telegram %}
+          <a class="contact-item" href="https://t.me/{{ settings.telegram }}" target="_blank" rel="noopener">{{ icon('telegram', 22) }}<span><small>Telegram</small><strong>@{{ settings.telegram }}</strong></span></a>
+          {% endif %}
+          {% if settings.max_url %}
+          <a class="contact-item" href="{{ settings.max_url }}" target="_blank" rel="noopener">{{ icon('max', 22) }}<span><small>Max</small><strong>Написать в Max</strong></span></a>
+          {% endif %}
+          <a class="contact-item" href="mailto:{{ settings.email }}">{{ icon('mail', 22) }}<span><small>E-mail</small><strong>{{ settings.email }}</strong></span></a>
+        </div>
+        <p class="muted small">Мастерская в г. {{ settings.city }}. Показ картин вживую — по договорённости.</p>
+        <p class="muted small">{{ settings.legal_info }}</p>
+      </div>
+      <div class="panel">
+        <h3>Напишите мне</h3>
+        {% with kind="question", show_message=True, message_label="Ваш вопрос" %}{% include "partials/lead_form.html" %}{% endwith %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

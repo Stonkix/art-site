@@ -1,0 +1,30 @@
+<div class="results-bar">
+  <span>{% if total %}{{ total }} {{ total|plural('картина', 'картины', 'картин') }}{% else %}Ничего не найдено{% endif %}</span>
+  <button class="btn btn-light btn-sm filters-toggle" type="button" data-filters-toggle>Фильтры</button>
+</div>
+
+{% if items %}
+<div class="grid-art">
+  {% for p in items %}{% include "partials/card.html" %}{% endfor %}
+</div>
+{% else %}
+<div class="empty">
+  <p>Под такие параметры сейчас нет картин. Напишу похожую на заказ — под ваш размер и бюджет.</p>
+  <button class="btn btn-primary" type="button" data-lead="commission" data-title="Картина на заказ"
+          data-sub="Опишите, что ищете: сюжет, размер, бюджет.">Обсудить заказ</button>
+</div>
+{% endif %}
+
+{% if pages > 1 %}
+<nav class="pager" aria-label="Страницы">
+  {% for n in range(1, pages + 1) %}
+    {% if n == f.page %}
+    <span class="pager-current" aria-current="page">{{ n }}</span>
+    {% else %}
+    {% set qs = f.query_string(page=n if n > 1 else None) %}
+    <a href="/catalog{% if qs %}?{{ qs }}{% endif %}" hx-get="/catalog{% if qs %}?{{ qs }}{% endif %}"
+       hx-target="#results" hx-push-url="true" hx-swap="innerHTML show:#results:top">{{ n }}</a>
+    {% endif %}
+  {% endfor %}
+</nav>
+{% endif %}
