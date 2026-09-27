@@ -1,23 +1,23 @@
 {% extends "base.html" %}
 {% from "partials/icons.html" import icon %}
-{% block title %}Об авторе и контакты — {{ settings.artist_name }}{% endblock %}
+{% block title %}О галерее и контакты — {{ settings.site_name }}{% endblock %}
 
 {% block content %}
 {% set pr = profile() %}
 <div class="container page-head">
-  <nav class="crumbs" aria-label="Навигация"><a href="/">Главная</a><span>/</span>Об авторе</nav>
+  <nav class="crumbs" aria-label="Навигация"><a href="/">Главная</a><span>/</span>О галерее</nav>
 </div>
 
 <section class="container about-hero">
-  <img class="author-photo" src="{{ pr.photo_url }}" alt="{{ settings.artist_name }}" width="480" height="600">
+  <img class="author-photo" src="{{ pr.photo_url }}" alt="{{ settings.site_name }}" width="480" height="600">
   <div>
-    <p class="eyebrow">{{ settings.artist_title }}</p>
-    <h1>{{ settings.artist_name }}</h1>
+    <p class="eyebrow">О галерее</p>
+    <h1>{{ settings.site_name }}</h1>
     {% for para in pr.paragraphs %}
     <p{% if loop.first %} class="lead"{% endif %}>{{ para }}</p>
     {% endfor %}
     <div class="hero-cta">
-      <a class="btn btn-primary" href="/catalog">Смотреть картины</a>
+      <a class="btn btn-primary" href="/catalog">Смотреть каталог</a>
       <a class="btn btn-ghost" href="#contacts">Контакты</a>
     </div>
   </div>
@@ -27,7 +27,7 @@
 <section class="section section-wall">
   <div class="container">
     <div class="section-head">
-      <h2>В частных коллекциях</h2>
+      <h2>Уже нашли свой дом</h2>
       <a class="link-arrow" href="/catalog?sold=1">Все работы</a>
     </div>
     <div class="grid-art">{% for p in sold %}{% include "partials/card.html" %}{% endfor %}</div>
@@ -59,11 +59,10 @@
           {% endif %}
           <a class="contact-item" href="mailto:{{ settings.email }}">{{ icon('mail', 22) }}<span><small>E-mail</small><strong>{{ settings.email }}</strong></span></a>
         </div>
-        <p class="muted small">Мастерская в г. {{ settings.city }}. Показ картин вживую — по договорённости.</p>
-        <p class="muted small">{{ settings.legal_info }}</p>
+        <p class="muted small">{{ settings.city }}. Посмотреть картины вживую можно по договорённости.</p>
       </div>
       <div class="panel">
-        <h3>Напишите мне</h3>
+        <h3>Напишите нам</h3>
         {% with kind="question", show_message=True, message_label="Ваш вопрос" %}{% include "partials/lead_form.html" %}{% endwith %}
       </div>
     </div>

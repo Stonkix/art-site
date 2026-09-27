@@ -6,9 +6,8 @@
 {% block head %}
 <script type="application/ld+json">{{ {
   "@context": "https://schema.org",
-  "@type": "Person",
-  "name": settings.artist_name,
-  "jobTitle": settings.artist_title,
+  "@type": "ArtGallery",
+  "name": settings.site_name,
   "url": settings.base_url,
   "telephone": settings.phone,
   "email": settings.email,
@@ -21,13 +20,13 @@
 <section class="hero">
   <div class="container hero-grid">
     <div>
-      <p class="eyebrow">{{ settings.artist_title }} · {{ settings.city }}</p>
+      <p class="eyebrow">{{ settings.site_tagline }} · {{ settings.city }}</p>
       <h1>Картины, которые хочется <em>рассматривать</em></h1>
-      <p class="lead">Оригинальные работы в единственном экземпляре — для дома, в подарок или в коллекцию. Помогу подобрать картину под интерьер и напишу на заказ.</p>
+      <p class="lead">Оригинальные работы современных художников в единственном экземпляре — для дома, в подарок или в коллекцию. Поможем подобрать картину под интерьер и закажем работу у художника.</p>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="/catalog">Смотреть картины{% if total %} · {{ total }}{% endif %}</a>
+        <a class="btn btn-primary" href="/catalog">Смотреть каталог{% if total %} · {{ total }}{% endif %}</a>
         <button class="btn btn-ghost" type="button" data-lead="commission" data-title="Картина на заказ"
-                data-sub="Опишите идею, размер и сроки — отвечу, сколько это будет стоить.">Написать на заказ</button>
+                data-sub="Опишите идею, размер и сроки — подберём художника и назовём стоимость.">Заказать картину</button>
       </div>
     </div>
     {% if hero %}
@@ -37,7 +36,7 @@
              {% if hero.cover.width %}width="{{ hero.cover.width }}" height="{{ hero.cover.height }}"{% endif %}>
       </a>
       <figcaption>
-        <a href="{{ hero.url }}">«{{ hero.title }}»</a>
+        <a href="{{ hero.url }}">«{{ hero.title }}»{% if hero.author %} <span class="muted">— {{ hero.author }}</span>{% endif %}</a>
         <span>{{ hero.medium }}, {{ hero.size_label }}</span>
       </figcaption>
     </figure>
@@ -50,7 +49,7 @@
   <div class="container">
     <div class="section-head">
       <h2>Избранные работы</h2>
-      <a class="link-arrow" href="/catalog">Все картины</a>
+      <a class="link-arrow" href="/catalog">Весь каталог</a>
     </div>
     <div class="grid-art">{% for p in featured %}{% include "partials/card.html" %}{% endfor %}</div>
   </div>
@@ -61,7 +60,7 @@
 <section class="section">
   <div class="container">
     <div class="section-head">
-      <h2>Новые работы</h2>
+      <h2>Новые поступления</h2>
       <a class="link-arrow" href="/catalog">Весь каталог</a>
     </div>
     <div class="grid-art">{% for p in newest %}{% include "partials/card.html" %}{% endfor %}</div>
@@ -86,15 +85,15 @@
       </div>
       <div class="feature">
         <h3>Сертификат подлинности</h3>
-        <p>К картине прилагается сертификат с фотографией работы, описанием и подписью автора.</p>
+        <p>К картине прилагается сертификат с фотографией работы, описанием и подписью художника.</p>
       </div>
       <div class="feature">
         <h3>Бережная доставка</h3>
-        <p>Упаковываю в несколько слоёв и жёсткий короб. Отправляю по всей России, по городу — доставлю лично.</p>
+        <p>Упаковываем в несколько слоёв и жёсткий короб. Отправляем по всей России, по городу доставим лично.</p>
       </div>
       <div class="feature">
-        <h3>Помогу выбрать</h3>
-        <p>Пришлю дополнительные фото и видео, покажу картину в вашем интерьере по фото комнаты.</p>
+        <h3>Поможем выбрать</h3>
+        <p>Пришлём дополнительные фото и видео, покажем, как картина будет смотреться в вашем интерьере.</p>
       </div>
     </div>
   </div>
@@ -104,7 +103,7 @@
   <div class="container split">
     <div>
       <p class="eyebrow">Картина на заказ</p>
-      <h2>Напишу картину специально для вас</h2>
+      <h2>Художник напишет картину специально для вас</h2>
       <p class="lead">По вашей фотографии, под размер стены или в цветах интерьера. Сначала согласуем эскиз — работа начинается, только когда он вам нравится.</p>
       <a class="link-arrow" href="/how-to-buy#commission">Как проходит работа над заказом</a>
     </div>
@@ -118,12 +117,12 @@
 
 <section class="section section-wall">
   <div class="container author-teaser">
-    <img class="author-photo" src="{{ pr.photo_url }}" alt="{{ settings.artist_name }}" loading="lazy">
+    <img class="author-photo" src="{{ pr.photo_url }}" alt="{{ settings.site_name }}" loading="lazy">
     <div>
-      <p class="eyebrow">Об авторе</p>
-      <h2>{{ settings.artist_name }}</h2>
+      <p class="eyebrow">О галерее</p>
+      <h2>{{ settings.site_name }}</h2>
       {% if pr.paragraphs %}<p class="lead">{{ pr.paragraphs[0] }}</p>{% endif %}
-      <a class="link-arrow" href="/about">Подробнее об авторе</a>
+      <a class="link-arrow" href="/about">Подробнее о галерее</a>
     </div>
   </div>
 </section>

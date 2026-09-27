@@ -3,7 +3,7 @@
   <div class="badges">
     {% if p.status == 'sold' %}<span class="badge badge-sold">Продана</span>
     {% elif p.status == 'reserved' %}<span class="badge badge-reserved">Забронирована</span>
-    {% elif p.is_new %}<span class="badge badge-new">Новая</span>{% endif %}
+    {% elif p.is_new %}<span class="badge badge-new">Новинка</span>{% endif %}
   </div>
   <div class="art-wall">
     {% if p.cover %}
@@ -13,13 +13,16 @@
     <div class="noimg">Фото скоро</div>
     {% endif %}
   </div>
-  <h3><a href="{{ p.url }}">{{ p.title }}</a></h3>
-  <p class="art-meta">{{ p.medium }} · {{ p.size_label }}</p>
-  {% if p.is_sold %}
-  <p class="art-price is-muted">В частной коллекции</p>
-  {% elif p.price %}
-  <p class="art-price">{{ p.price|price }}</p>
-  {% else %}
-  <p class="art-price is-muted">Цена по запросу</p>
-  {% endif %}
+  <div class="art-card-body">
+    <h3><a href="{{ p.url }}">{{ p.title }}</a></h3>
+    {% if p.author %}<p class="art-author">{{ p.author }}</p>{% endif %}
+    <p class="art-meta">{{ p.medium }} · {{ p.size_label }}</p>
+    {% if p.is_sold %}
+    <p class="art-price is-muted">Уже нашла свой дом</p>
+    {% elif p.price %}
+    <p class="art-price">{{ p.price|price }}</p>
+    {% else %}
+    <p class="art-price is-muted">Цена по запросу</p>
+    {% endif %}
+  </div>
 </article>

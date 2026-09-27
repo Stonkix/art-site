@@ -35,7 +35,7 @@ templates.env.globals.update(
     LEAD_KINDS=LEAD_KINDS,
     static_v=int(time.time()),  # сброс кэша статики при каждом рестарте
     now=datetime.now,
-    profile=get_profile,  # «Об авторе» из панели управления: фото и текст
+    profile=get_profile,  # «О галерее» из панели управления: фото и текст
 )
 templates.env.filters.update(
     price=fmt_price,

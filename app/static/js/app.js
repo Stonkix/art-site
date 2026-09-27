@@ -63,6 +63,17 @@
     if (e.target.closest("[data-filters-toggle]")) $("#filters")?.classList.toggle("is-open");
   });
 
+  // Жанры-чипсы: меняют жанр в форме фильтров, остальные фильтры сохраняются
+  document.addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip[data-genre]");
+    const form = $("#filters");
+    if (!chip || !form || !window.htmx) return;
+    e.preventDefault();
+    form.elements.genre.value = chip.dataset.genre;
+    $$(".chip").forEach((c) => (c === chip ? c.setAttribute("aria-current", "true") : c.removeAttribute("aria-current")));
+    form.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+
   // ---------- Галерея картины ----------
   const gallery = $("[data-gallery]");
   const lightbox = $("#lightbox");

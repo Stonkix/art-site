@@ -26,16 +26,14 @@ class Settings(BaseSettings):
     smtp_password: str = ""
     leads_email: str = ""  # куда слать заявки; пусто — на EMAIL из контактов
 
-    # Данные автора — выводятся в шапке, подвале, контактах и превью ссылок
-    site_name: str = "Имя Художника — картины"
-    artist_name: str = "Имя Художника"
-    artist_title: str = "Художник"
+    # Данные галереи — выводятся в шапке, подвале, контактах и превью ссылок
+    site_name: str = "Галерея картин"
+    site_tagline: str = "Оригинальные картины"
     city: str = "Калуга"
     phone: str = "+7 900 000-00-00"
     email: str = "hello@example.com"
     telegram: str = ""  # без @; пусто — ссылка не показывается
     max_url: str = ""  # пусто — ссылка на Max не показывается
-    legal_info: str = "Самозанятый Фамилия И. О., ИНН 000000000000"
     yandex_metrika_id: str = ""
 
     @property

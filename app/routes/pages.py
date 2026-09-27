@@ -108,12 +108,6 @@ def index(request: Request, db: Session = Depends(get_db)):
         select(Review).where(Review.is_published.is_(True)).order_by(Review.created_at.desc()).limit(3)
     ).all()
     total = db.scalar(select(func.count()).select_from(available().subquery())) or 0
-    genre_counts = db.execute(
-        select(Painting.genre, func.count())
-        .where(Painting.is_published.is_(True), Painting.status != "sold")
-        .group_by(Painting.genre)
-        .order_by(func.count().desc())
-    ).all()
     return templates.TemplateResponse(
         request,
         "index.html",
@@ -123,9 +117,19 @@ def index(request: Request, db: Session = Depends(get_db)):
             "newest": newest,
             "reviews": reviews,
             "total": total,
-            "genre_counts": [(g, n) for g, n in genre_counts if g in GENRES],
+            "genre_counts": _genre_counts(db),
         },
     )
+
+
+def _genre_counts(db: Session) -> list[tuple[str, int]]:
+    rows = db.execute(
+        select(Painting.genre, func.count())
+        .where(Painting.is_published.is_(True), Painting.status != "sold")
+        .group_by(Painting.genre)
+        .order_by(func.count().desc())
+    ).all()
+    return [(g, n) for g, n in rows if g in GENRES]
 
 
 @router.get("/catalog", response_class=HTMLResponse)
@@ -138,7 +142,7 @@ def catalog(request: Request, db: Session = Depends(get_db)):
     items = db.scalars(
         q.order_by(SORTS[f.sort][1], Painting.id.desc()).limit(PAGE_SIZE).offset((f.page - 1) * PAGE_SIZE)
     ).all()
-    ctx = {"f": f, "items": items, "total": total, "pages": pages, "sorts": SORTS}
+    ctx = {"f": f, "items": items, "total": total, "pages": pages, "sorts": SORTS, "genre_counts": _genre_counts(db)}
     # HTMX-запрос от фильтров: отдаём только сетку, без шапки и фильтров
     is_htmx = request.headers.get("HX-Request") == "true" and not request.headers.get("HX-History-Restore-Request")
     response = templates.TemplateResponse(
@@ -166,29 +170,9 @@ def painting_detail(ref: str, request: Request, db: Session = Depends(get_db)):
     return templates.TemplateResponse(
         request,
         "painting.html",
-        {"p": p, "similar": similar, "json_ld": _artwork_json_ld(p), "room": room_preview(p)},
+        {"p": p, "similar": similar, "json_ld": _artwork_json_ld(p)},
     )
 
-
-SOFA_CM = (210, 78)  # ширина и высота дивана-ориентира, см
-
-
-def room_preview(p: Painting) -> dict:
-    """Масштаб для «Примерить в интерьере»: комната 16:9, картина висит в 20 см над диваном.
-
-    s — сколько процентов ширины комнаты занимает 1 см. Большие холсты уменьшают масштаб,
-    чтобы картина целиком поместилась на стене, — диван при этом уменьшается вместе с ней.
-    """
-    k = 16 / 9  # перевод «% ширины» в «% высоты» для комнаты 16:9
-    s = min(50 / SOFA_CM[0], 25 / p.height_cm, 80 / p.width_cm)
-    floor = 10
-    sofa_h = SOFA_CM[1] * s * k
-    return {
-        "art_w": round(p.width_cm * s, 2),
-        "art_bottom": round(floor + sofa_h + 20 * s * k, 2),
-        "sofa_w": round(SOFA_CM[0] * s, 2),
-        "floor": floor,
-    }
 
 
 def _artwork_json_ld(p: Painting) -> dict:
@@ -203,9 +187,10 @@ def _artwork_json_ld(p: Painting) -> dict:
         "artMedium": TECHNIQUES.get(p.technique, ""),
         "width": {"@type": "Distance", "name": f"{p.width_cm} см"},
         "height": {"@type": "Distance", "name": f"{p.height_cm} см"},
-        "creator": {"@type": "Person", "name": settings.artist_name},
         "image": [settings.base_url + ph.full for ph in p.photos[:5]],
     }
+    if p.author:
+        data["creator"] = {"@type": "Person", "name": p.author}
     if p.base:
         data["artworkSurface"] = p.base
     if p.year:

@@ -1,5 +1,5 @@
 <div class="results-bar">
-  <span>{% if total %}{{ total }} {{ total|plural('картина', 'картины', 'картин') }}{% else %}Ничего не найдено{% endif %}</span>
+  <span>{% if total %}{{ total }} {{ total|plural('картина', 'картины', 'картин') }}{% if f.genre %} · {{ GENRES[f.genre]|lower }}{% endif %}{% else %}Ничего не найдено{% endif %}</span>
   <button class="btn btn-light btn-sm filters-toggle" type="button" data-filters-toggle>Фильтры</button>
 </div>
 
@@ -9,9 +9,9 @@
 </div>
 {% else %}
 <div class="empty">
-  <p>Под такие параметры сейчас нет картин. Напишу похожую на заказ — под ваш размер и бюджет.</p>
+  <p>Под такие параметры сейчас нет картин. Подберём похожую работу или закажем картину у художника — под ваш размер и бюджет.</p>
   <button class="btn btn-primary" type="button" data-lead="commission" data-title="Картина на заказ"
-          data-sub="Опишите, что ищете: сюжет, размер, бюджет.">Обсудить заказ</button>
+          data-sub="Опишите, что ищете: сюжет, размер, бюджет.">Подобрать картину</button>
 </div>
 {% endif %}
 

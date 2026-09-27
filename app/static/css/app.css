@@ -101,6 +101,10 @@ section[id] { scroll-margin-top: 80px; }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
 .section-head h2 { margin: 0; }
 .page-head { padding-top: 32px; padding-bottom: 8px; }
+.page-intro { padding: 40px 0 36px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.page-intro h1 { margin-bottom: .3em; }
+.page-intro .lead { max-width: 640px; margin: 0; }
+@media (min-width: 768px) { .page-intro { padding: 56px 0 48px; } }
 .crumbs { font-size: .85rem; color: var(--muted); margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; }
 .crumbs a { color: var(--muted); }
 .split { display: grid; gap: 40px; align-items: center; }
@@ -141,12 +145,16 @@ section[id] { scroll-margin-top: 80px; }
 /* ---------- Карточки картин ---------- */
 .grid-art { display: grid; gap: 40px 28px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
 .art-card { position: relative; }
-.art-card .art-wall { transition: background .2s; }
-.art-card:hover .art-wall { background: #ebe6dd; }
+.art-card .art-wall { transition: background .25s; }
+.art-card .art-wall img { transition: transform .35s ease, box-shadow .35s ease; }
+.art-card:hover .art-wall { background: #ece7de; }
+.art-card:hover .art-wall img { transform: translateY(-6px); box-shadow: 0 2px 4px rgb(34 32 28 / 12%), 0 22px 40px rgb(34 32 28 / 22%); }
+.art-card-body { padding-top: 16px; }
 .art-card.is-sold .art-wall img { filter: saturate(.55); opacity: .8; }
-.art-card h3 { font-size: 1.35rem; margin: 14px 0 2px; }
+.art-card h3 { font-size: 1.4rem; margin: 0 0 2px; }
 .art-card h3 a { text-decoration: none; }
 .art-card h3 a::after { content: ""; position: absolute; inset: 0; } /* вся карточка кликабельна */
+.art-author { font-family: var(--serif); font-style: italic; font-size: 1.1rem; color: var(--ink-soft); margin: 0 0 4px; }
 .art-meta { color: var(--muted); font-size: .88rem; margin: 0; }
 .art-price { margin-top: 6px; font-weight: 600; }
 .art-price.is-muted { font-weight: 400; color: var(--muted); }
@@ -157,7 +165,14 @@ section[id] { scroll-margin-top: 80px; }
 .badge-sold { background: var(--surface); color: var(--muted); }
 
 /* ---------- Каталог ---------- */
-.filters { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: end; padding: 20px 0 28px; border-bottom: 1px solid var(--line); margin-bottom: 32px; }
+.chips { display: flex; gap: 8px; overflow-x: auto; padding: 24px 0 4px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: none; padding: 9px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); text-decoration: none; white-space: nowrap; transition: border-color .15s, background .15s; }
+.chip span { color: var(--muted); margin-left: 4px; font-size: .88em; }
+.chip:hover { border-color: var(--ink); color: var(--ink); }
+.chip[aria-current] { background: var(--ink); border-color: var(--ink); color: #fff; }
+.chip[aria-current] span { color: rgb(255 255 255 / 70%); }
+.filters { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: end; padding: 18px 20px; margin: 16px 0 32px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .field { display: grid; gap: 6px; border: 0; padding: 0; margin: 0; min-width: 0; }
 .field > span { font-size: .8rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 .field em { font-style: normal; font-weight: 400; text-transform: none; letter-spacing: 0; }
@@ -198,28 +213,31 @@ select {
 .art-thumbs button[aria-current="true"] { border-color: var(--ink); }
 .art-thumbs img { width: 100%; height: 100%; object-fit: contain; }
 .art-info { position: sticky; top: 96px; }
-.art-info h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: .2em; }
-.art-sub { color: var(--muted); margin-bottom: 24px; }
+.art-info .eyebrow { margin-bottom: .6rem; }
+.art-info h1 { font-size: clamp(2.2rem, 4vw, 3.2rem); margin-bottom: .1em; }
+.art-author-lg { font-family: var(--serif); font-style: italic; font-size: 1.4rem; color: var(--ink-soft); margin: 0 0 6px; }
+.art-sub { color: var(--muted); margin-bottom: 28px; }
+.buy-box { border-top: 1px solid var(--ink); padding-top: 22px; margin-bottom: 28px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #5d8a5b; margin-right: 8px; vertical-align: 1px; }
+.art-actions-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.art-zoom-hint { display: flex; align-items: center; gap: 6px; justify-content: center; margin-top: 10px; font-size: .82rem; color: var(--muted); }
+.perks { list-style: none; padding: 0; margin: 0 0 18px; display: grid; gap: 14px; }
+.perks li { display: flex; gap: 14px; align-items: flex-start; color: var(--accent); }
+.perks span { display: grid; color: var(--muted); font-size: .9rem; }
+.perks strong { color: var(--ink); font-weight: 600; }
+.art-about { padding-bottom: 72px; }
+.art-about .prose { font-size: 1.08rem; color: var(--ink-soft); }
 .art-price-lg { font-family: var(--serif); font-size: 2.2rem; font-weight: 600; line-height: 1.1; }
-.status-line { margin: 6px 0 24px; font-size: .95rem; }
+.status-line { margin: 8px 0 22px; font-size: .95rem; }
 .status-line.is-sold { color: var(--muted); }
 .status-line.is-reserved { color: var(--accent); }
-.art-actions { display: grid; gap: 10px; margin-bottom: 28px; }
-.specs { margin: 0 0 28px; border-top: 1px solid var(--line); }
+.art-actions { display: grid; gap: 10px; }
+.specs { margin: 0 0 28px; }
 .specs div { display: flex; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--line); }
 .specs dt { color: var(--muted); }
 .specs dd { margin: 0; text-align: right; }
 .prose { white-space: pre-line; max-width: 68ch; }
-.art-section { margin-top: 56px; }
-.buy-notes { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; color: var(--ink-soft); font-size: .95rem; }
-.buy-notes li { display: flex; gap: 10px; }
-.buy-notes li::before { content: "—"; color: var(--accent); }
 
-/* Примерка в интерьере: масштаб считает сервер (диван ≈ 210 см) */
-.room { position: relative; aspect-ratio: 16 / 9; background: linear-gradient(#ebe6de 0 88%, #d9d1c4 88%); overflow: hidden; }
-.room-art { position: absolute; left: 50%; transform: translateX(-50%); box-shadow: 0 2px 3px rgb(0 0 0 / 18%), 0 8px 18px rgb(0 0 0 / 16%); }
-.room-sofa { position: absolute; left: 50%; transform: translateX(-50%); height: auto; }
-.room-note { font-size: .85rem; color: var(--muted); margin-top: 10px; }
 
 .mobile-cta { display: none; }
 @media (max-width: 979px) {
@@ -249,6 +267,7 @@ select {
 .steps li { counter-increment: step; display: grid; gap: 6px; }
 .steps li::before { content: counter(step, decimal-leading-zero); font-family: var(--serif); font-size: 2.4rem; color: var(--accent); line-height: 1; }
 .steps span { color: var(--ink-soft); }
+.steps-list { grid-template-columns: 1fr; gap: 22px; margin-top: 24px; }
 .info-grid { display: grid; gap: 28px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
 .info-block { background: var(--surface); border: 1px solid var(--line); padding: 28px; }
 .info-block ul { padding-left: 1.1em; margin: 0; display: grid; gap: 6px; color: var(--ink-soft); }
@@ -271,6 +290,7 @@ select {
 .footer-h { font-weight: 600; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .08em; font-size: .78rem; color: var(--muted); }
 .site-footer a { display: flex; align-items: center; gap: 10px; padding: 4px 0; text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
+.site-footer .footer-inline { display: inline; padding: 0; }
 .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); margin-top: 40px; padding-top: 20px; color: var(--muted); }
 
 /* ---------- Диалоги ---------- */

@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% from "partials/icons.html" import icon %}
 
-{% block title %}«{{ p.title }}» — {{ p.medium|lower }}, {{ p.size_label }} — купить картину {{ settings.artist_name }}{% endblock %}
-{% block description %}Картина «{{ p.title }}»: {{ p.subtitle }}. {% if p.price and not p.is_sold %}Цена {{ p.price|price }}. {% endif %}{{ p.description[:140] }}{% endblock %}
+{% block title %}«{{ p.title }}»{% if p.author %}, {{ p.author }}{% endif %} — {{ p.medium|lower }}, {{ p.size_label }} — {{ settings.site_name }}{% endblock %}
+{% block description %}Картина «{{ p.title }}»{% if p.author %}, автор {{ p.author }}{% endif %}: {{ p.subtitle }}. {% if p.price and not p.is_sold %}Цена {{ p.price|price }}. {% endif %}{{ p.description[:120] }}{% endblock %}
 {% block og_type %}article{% endblock %}
 {% block og_title %}«{{ p.title }}»{% if p.price and not p.is_sold %} — {{ p.price|price }}{% endif %}{% endblock %}
 {% block og_description %}{{ p.subtitle }}. {{ p.description[:120] }}{% endblock %}
@@ -17,7 +17,7 @@
 {% block content %}
 <div class="container page-head">
   <nav class="crumbs" aria-label="Навигация">
-    <a href="/">Главная</a><span>/</span><a href="/catalog">Картины</a><span>/</span>{{ p.title }}
+    <a href="/">Главная</a><span>/</span><a href="/catalog">Каталог</a><span>/</span><a href="/catalog?genre={{ p.genre }}">{{ GENRES[p.genre] }}</a>
   </nav>
 </div>
 
@@ -30,11 +30,12 @@
           <img id="art-main-img" src="{{ p.photos[0].full }}" alt="«{{ p.title }}», {{ p.medium|lower }}" fetchpriority="high"
                {% if p.photos[0].width %}width="{{ p.photos[0].width }}" height="{{ p.photos[0].height }}"{% endif %}>
         </span>
+        <span class="art-zoom-hint">{{ icon('arrow', 14) }} Нажмите, чтобы рассмотреть детали</span>
       </button>
       {% if p.photos|length > 1 %}
       <div class="art-thumbs" role="list">
         {% for ph in p.photos %}
-        <button type="button" role="listitem" data-show="{{ loop.index0 }}" data-src="{{ ph.full }}" aria-label="Фото {{ loop.index }}"
+        <button type="button" role="listitem" data-show="{{ loop.index0 }}" aria-label="Фото {{ loop.index }}"
                 {% if loop.first %}aria-current="true"{% endif %}>
           <img src="{{ ph.thumb }}" alt="" loading="lazy">
         </button>
@@ -46,78 +47,65 @@
     {% else %}
     <div class="art-wall"><div class="noimg">Фото скоро появится</div></div>
     {% endif %}
-
-    {% if p.description %}
-    <section class="art-section">
-      <h2>О картине</h2>
-      <div class="prose">{{ p.description }}</div>
-    </section>
-    {% endif %}
-
-    {% if p.photos %}
-    <section class="art-section no-print">
-      <h2>Примерить в интерьере</h2>
-      <div class="room" aria-label="Картина над диваном в масштабе">
-        <img class="room-art" src="{{ p.cover.thumb }}" alt="" loading="lazy"
-             style="width: {{ room.art_w }}%; bottom: {{ room.art_bottom }}%">
-        <svg class="room-sofa" viewBox="0 0 210 78" style="width: {{ room.sofa_w }}%; bottom: {{ room.floor }}%" aria-hidden="true">
-          <rect x="14" y="0" width="182" height="46" rx="10" fill="#bdb2a0"/>
-          <rect x="0" y="22" width="30" height="46" rx="10" fill="#b0a592"/>
-          <rect x="180" y="22" width="30" height="46" rx="10" fill="#b0a592"/>
-          <rect x="22" y="40" width="166" height="28" rx="6" fill="#c9bfae"/>
-          <rect x="18" y="68" width="6" height="10" fill="#8a7f6d"/>
-          <rect x="186" y="68" width="6" height="10" fill="#8a7f6d"/>
-        </svg>
-      </div>
-      <p class="room-note">Картина {{ p.size_label }} над диваном шириной около 210 см — в одном масштабе.</p>
-    </section>
-    {% endif %}
   </div>
 
   <aside class="art-info">
+    <p class="eyebrow">{{ GENRES[p.genre] }}</p>
     <h1>{{ p.title }}</h1>
+    {% if p.author %}<p class="art-author-lg">{{ p.author }}</p>{% endif %}
     <p class="art-sub">{{ p.subtitle }}</p>
 
-    {% if p.is_sold %}
-    <div class="art-price-lg">Продана</div>
-    <p class="status-line is-sold">Картина в частной коллекции. Могу написать похожую на заказ.</p>
-    <div class="art-actions">
-      <button class="btn btn-primary btn-block" type="button" data-lead="commission" data-painting="{{ p.id }}"
-              data-title="Похожая картина на заказ" data-sub="Напишу работу в том же настроении — под ваш размер.">Заказать похожую</button>
+    <div class="buy-box">
+      {% if p.is_sold %}
+      <div class="art-price-lg">Продана</div>
+      <p class="status-line is-sold">Картина уже нашла свой дом. Можем подобрать похожую или заказать у художника.</p>
+      <div class="art-actions">
+        <button class="btn btn-primary btn-block" type="button" data-lead="commission" data-painting="{{ p.id }}"
+                data-title="Похожая картина" data-sub="Подберём работу в том же настроении или закажем у художника под ваш размер.">Хочу похожую</button>
+      </div>
+      {% else %}
+      <div class="art-price-lg">{% if p.price %}{{ p.price|price }}{% else %}Цена по запросу{% endif %}</div>
+      <p class="status-line{% if p.status == 'reserved' %} is-reserved{% endif %}">
+        {% if p.status == 'reserved' %}Забронирована — можно встать в очередь{% else %}<span class="dot"></span>В наличии · оригинал в единственном экземпляре{% endif %}
+      </p>
+      <div class="art-actions">
+        <button class="btn btn-primary btn-block" type="button" data-lead="buy" data-painting="{{ p.id }}"
+                data-title="Хочу эту картину" data-sub="«{{ p.title }}». Свяжемся, ответим на вопросы и расскажем про доставку.">Хочу эту картину</button>
+        <div class="art-actions-row">
+          <button class="btn btn-ghost" type="button" data-lead="question" data-painting="{{ p.id }}"
+                  data-title="Вопрос о картине" data-sub="«{{ p.title }}». Можно попросить дополнительные фото и видео.">Задать вопрос</button>
+          <a class="btn btn-light" href="{{ settings.phone_href }}">{{ icon('phone', 16) }}Позвонить</a>
+        </div>
+      </div>
+      {% endif %}
     </div>
-    {% else %}
-    <div class="art-price-lg">{% if p.price %}{{ p.price|price }}{% else %}Цена по запросу{% endif %}</div>
-    <p class="status-line{% if p.status == 'reserved' %} is-reserved{% endif %}">
-      {% if p.status == 'reserved' %}Забронирована — можно встать в очередь{% else %}В наличии · оригинал в единственном экземпляре{% endif %}
-    </p>
-    <div class="art-actions">
-      <button class="btn btn-primary btn-block" type="button" data-lead="buy" data-painting="{{ p.id }}"
-              data-title="Хочу эту картину" data-sub="«{{ p.title }}». Свяжусь, отвечу на вопросы и расскажу про доставку.">Хочу эту картину</button>
-      <button class="btn btn-ghost btn-block" type="button" data-lead="question" data-painting="{{ p.id }}"
-              data-title="Вопрос о картине" data-sub="«{{ p.title }}». Можно попросить дополнительные фото.">Задать вопрос</button>
-      <a class="btn btn-light btn-block" href="{{ settings.phone_href }}">{{ icon('phone') }}{{ settings.phone }}</a>
-    </div>
-    {% endif %}
 
     <dl class="specs">
+      {% if p.author %}<div><dt>Автор</dt><dd>{{ p.author }}</dd></div>{% endif %}
       <div><dt>Техника</dt><dd>{{ TECHNIQUES[p.technique] }}</dd></div>
       {% if p.base %}<div><dt>Основа</dt><dd>{{ p.base }}</dd></div>{% endif %}
       <div><dt>Размер</dt><dd>{{ p.size_label }}</dd></div>
-      <div><dt>Жанр</dt><dd>{{ GENRES[p.genre] }}</dd></div>
       {% if p.year %}<div><dt>Год</dt><dd>{{ p.year }}</dd></div>{% endif %}
       <div><dt>Рама</dt><dd>{{ 'Есть' if p.framed else 'Без рамы' }}</dd></div>
     </dl>
 
     {% if not p.is_sold %}
-    <ul class="buy-notes">
-      <li>Сертификат подлинности с подписью автора</li>
-      <li>Надёжная упаковка, доставка по России</li>
-      <li>Пришлю дополнительные фото и видео по запросу</li>
+    <ul class="perks">
+      <li>{{ icon('award', 20) }}<span><strong>Сертификат подлинности</strong>с подписью художника</span></li>
+      <li>{{ icon('truck', 20) }}<span><strong>Доставка по России</strong>надёжная упаковка, страховка</span></li>
+      <li>{{ icon('camera', 20) }}<span><strong>Больше фото и видео</strong>пришлём по запросу</span></li>
     </ul>
-    <p class="small" style="margin-top:14px"><a href="/how-to-buy">Как проходит покупка и доставка →</a></p>
+    <a class="link-arrow small" href="/how-to-buy">Как проходит покупка</a>
     {% endif %}
   </aside>
 </div>
+
+{% if p.description %}
+<section class="container art-about">
+  <h2>О картине</h2>
+  <div class="prose">{{ p.description }}</div>
+</section>
+{% endif %}
 
 {% if similar %}
 <section class="section section-wall no-print">
@@ -143,6 +131,6 @@
   <button class="lb-nav lb-prev" type="button" aria-label="Предыдущее фото">‹</button>
   <div class="lb-stage"><img class="lb-img" alt=""></div>
   <button class="lb-nav lb-next" type="button" aria-label="Следующее фото">›</button>
-  <div class="lb-hint">Нажмите на картину, чтобы рассмотреть детали</div>
+  <div class="lb-hint">Нажмите на картину, чтобы приблизить, — и ведите мышью</div>
 </dialog>
 {% endblock %}

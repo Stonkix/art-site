@@ -4,7 +4,7 @@
 <div class="col-12">
   <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center">
-      <h3 class="card-title">Об авторе</h3>
+      <h3 class="card-title">О галерее</h3>
       <a href="/about" target="_blank" rel="noopener">Посмотреть на сайте →</a>
     </div>
     <div class="card-body">
@@ -17,14 +17,14 @@
 
       <form method="post" enctype="multipart/form-data">
         <div class="mb-3 row">
-          <label class="col-sm-2 col-form-label" for="photo">Фото автора</label>
+          <label class="col-sm-2 col-form-label" for="photo">Фото</label>
           <div class="col-sm-10">
             <div class="portfolio-photo">
-              <img id="photo-preview" src="{{ prof.photo_url }}" alt="Фото автора">
+              <img id="photo-preview" src="{{ prof.photo_url }}" alt="Фото галереи">
               <div class="portfolio-photo-controls">
                 <input class="form-control{% if errors.photo %} is-invalid{% endif %}" type="file" id="photo" name="photo" accept="image/jpeg,image/png,image/webp">
                 {% if errors.photo %}<div class="invalid-feedback">{{ errors.photo }}</div>{% endif %}
-                <small class="text-muted">Лучше вертикальное фото — в мастерской или за работой. Показывается на главной и на странице «Об авторе».</small>
+                <small class="text-muted">Лучше вертикальное фото: картины в интерьере, шоурум или мастерская. Показывается на главной и на странице «О галерее».</small>
                 {% if prof.photo %}
                 <label class="form-check mt-2">
                   <input class="form-check-input" type="checkbox" name="photo_remove" value="1">
@@ -37,7 +37,7 @@
         </div>
 
         <div class="mb-3 row">
-          <label class="col-sm-2 col-form-label" for="about">О себе</label>
+          <label class="col-sm-2 col-form-label" for="about">Текст</label>
           <div class="col-sm-10">
             <textarea class="form-control{% if errors.about %} is-invalid{% endif %}" id="about" name="about" rows="10">{{ values.about }}</textarea>
             {% if errors.about %}<div class="invalid-feedback">{{ errors.about }}</div>{% endif %}

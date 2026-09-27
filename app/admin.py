@@ -86,6 +86,7 @@ class PaintingAdmin(ModelView, model=Painting):
     column_list = [
         Painting.id,
         Painting.title,
+        Painting.author,
         Painting.technique,
         Painting.price,
         Painting.status,
@@ -93,7 +94,7 @@ class PaintingAdmin(ModelView, model=Painting):
         Painting.is_published,
         Painting.created_at,
     ]
-    column_searchable_list = [Painting.title]
+    column_searchable_list = [Painting.title, Painting.author]
     column_sortable_list = [Painting.id, Painting.price, Painting.created_at]
     column_default_sort = [(Painting.id, True)]
     column_formatters = {
@@ -114,6 +115,7 @@ class PaintingAdmin(ModelView, model=Painting):
     }
     column_labels = {
         Painting.title: "Название",
+        Painting.author: "Автор (необязательно)",
         Painting.technique: "Техника",
         Painting.genre: "Жанр",
         Painting.base: "Основа (холст на подрамнике, картон, бумага…)",
@@ -137,7 +139,7 @@ class PaintingAdmin(ModelView, model=Painting):
         "status": {
             "choices": _choices(STATUSES),
             "label": "Статус",
-            "description": "Проданные картины уходят из каталога, но остаются на странице «Об авторе» как портфолио.",
+            "description": "Проданные картины уходят из каталога, но остаются на странице «О галерее» в блоке «Уже нашли дом».",
         },
         "description": {"show_chars_count": False},
     }
@@ -247,8 +249,8 @@ class ReviewAdmin(ModelView, model=Review):
 
 
 class ProfileAdmin(BaseView):
-    name = "Об авторе"
-    icon = "fa-solid fa-user"
+    name = "О галерее"
+    icon = "fa-solid fa-store"
 
     @expose("/profile", methods=["GET", "POST"])
     async def profile(self, request: Request):
@@ -265,7 +267,7 @@ class ProfileAdmin(BaseView):
                 form = await request.form()
                 values = {"about": str(form.get("about", "")).strip()}
                 if not values["about"]:
-                    errors["about"] = "Напишите пару предложений о себе"
+                    errors["about"] = "Напишите пару предложений о галерее"
 
                 new_photo = None
                 upload = form.get("photo")

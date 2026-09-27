@@ -123,41 +123,41 @@ def render(kind, w_cm, h_cm, **kw):
 
 
 PAINTINGS = [
-    dict(title="Туман над Окой", technique="oil", genre="landscape", base="Холст на подрамнике", width_cm=60, height_cm=40, year=2025, price=38000, is_featured=True,
+    dict(title="Туман над Окой", author="Ирина Соколова", technique="oil", genre="landscape", base="Холст на подрамнике", width_cm=60, height_cm=40, year=2025, price=38000, is_featured=True,
          art=("landscape", dict(sky=((214, 220, 222), (238, 232, 218)), land=[(150, 160, 150), (112, 128, 115), (80, 96, 84)], water=True))),
-    dict(title="Сирень в синей вазе", technique="oil", genre="flowers", base="Холст на подрамнике", width_cm=50, height_cm=60, year=2024, price=32000, is_featured=True,
+    dict(title="Сирень в синей вазе", author="Мария Ветрова", technique="oil", genre="flowers", base="Холст на подрамнике", width_cm=50, height_cm=60, year=2024, price=32000, is_featured=True,
          art=("flowers", dict(bg=(236, 228, 214), petals=[(186, 150, 205), (160, 120, 190), (214, 190, 228)], leaves=(92, 120, 78), vase=(60, 88, 150)))),
-    dict(title="Утро в Калуге", technique="acrylic", genre="cityscape", base="Холст на подрамнике", width_cm=70, height_cm=50, year=2025, price=45000,
+    dict(title="Утро в Калуге", author="Алексей Громов", technique="acrylic", genre="cityscape", base="Холст на подрамнике", width_cm=70, height_cm=50, year=2025, price=45000,
          art=("landscape", dict(sky=((244, 214, 180), (250, 238, 214)), land=[(196, 160, 132), (150, 110, 90), (110, 80, 70)], sun=(252, 222, 150)))),
-    dict(title="Золотая осень", technique="oil", genre="landscape", base="Холст на подрамнике", width_cm=80, height_cm=60, year=2024, price=55000, is_featured=True, framed=True,
+    dict(title="Золотая осень", author="Ирина Соколова", technique="oil", genre="landscape", base="Холст на подрамнике", width_cm=80, height_cm=60, year=2024, price=55000, is_featured=True, framed=True,
          art=("landscape", dict(sky=((190, 210, 226), (232, 226, 206)), land=[(214, 168, 70), (184, 120, 50), (120, 80, 40)]))),
-    dict(title="Пионы", technique="watercolor", genre="flowers", base="Бумага", width_cm=30, height_cm=40, year=2025, price=12000,
+    dict(title="Пионы", author="Мария Ветрова", technique="watercolor", genre="flowers", base="Бумага", width_cm=30, height_cm=40, year=2025, price=12000,
          art=("flowers", dict(bg=(246, 240, 234), petals=[(236, 170, 180), (224, 140, 160), (248, 206, 210)], leaves=(120, 150, 110), vase=(210, 204, 196)))),
-    dict(title="Ритм", technique="acrylic", genre="abstract", base="Холст на подрамнике", width_cm=100, height_cm=80, year=2025, price=None, is_featured=True,
+    dict(title="Ритм", author="Дмитрий Лаптев", technique="acrylic", genre="abstract", base="Холст на подрамнике", width_cm=100, height_cm=80, year=2025, price=None, is_featured=True,
          art=("abstract", dict(colors=[(240, 234, 222), (196, 102, 62), (48, 70, 96), (218, 180, 110), (30, 30, 30)]))),
-    dict(title="Натюрморт с гранатом", technique="oil", genre="still_life", base="Холст на картоне", width_cm=40, height_cm=40, year=2024, price=24000, status="reserved",
+    dict(title="Натюрморт с гранатом", author="Алексей Громов", technique="oil", genre="still_life", base="Холст на картоне", width_cm=40, height_cm=40, year=2024, price=24000, status="reserved",
          art=("still", dict(bg=(90, 80, 68), table=(150, 120, 92), objects=[(170, 40, 40), (214, 170, 80), (120, 30, 45)]))),
-    dict(title="Зимний лес", technique="oil", genre="landscape", base="Холст на подрамнике", width_cm=50, height_cm=70, year=2023, price=41000, status="sold",
+    dict(title="Зимний лес", author="Ирина Соколова", technique="oil", genre="landscape", base="Холст на подрамнике", width_cm=50, height_cm=70, year=2023, price=41000, status="sold",
          art=("landscape", dict(sky=((196, 206, 220), (236, 238, 240)), land=[(226, 230, 236), (150, 160, 172), (70, 84, 90)]))),
-    dict(title="Морской бриз", technique="acrylic", genre="landscape", base="Холст на подрамнике", width_cm=90, height_cm=60, year=2025, price=62000,
+    dict(title="Морской бриз", author="Дмитрий Лаптев", technique="acrylic", genre="landscape", base="Холст на подрамнике", width_cm=90, height_cm=60, year=2025, price=62000,
          art=("landscape", dict(sky=((168, 204, 226), (226, 236, 238)), land=[(120, 170, 190), (70, 130, 160)], water=True))),
-    dict(title="Лимоны", technique="gouache", genre="still_life", base="Картон", width_cm=30, height_cm=30, year=2025, price=9000,
+    dict(title="Лимоны", author="Мария Ветрова", technique="gouache", genre="still_life", base="Картон", width_cm=30, height_cm=30, year=2025, price=9000,
          art=("still", dict(bg=(210, 214, 200), table=(236, 232, 220), objects=[(240, 206, 60), (232, 190, 40)]))),
-    dict(title="Васильки", technique="pastel", genre="flowers", base="Бумага", width_cm=25, height_cm=35, year=2023, price=8000, status="sold",
+    dict(title="Васильки", author="Мария Ветрова", technique="pastel", genre="flowers", base="Бумага", width_cm=25, height_cm=35, year=2023, price=8000, status="sold",
          art=("flowers", dict(bg=(240, 236, 220), petals=[(70, 110, 200), (100, 140, 220), (230, 230, 240)], leaves=(110, 140, 90), vase=(190, 170, 140)))),
-    dict(title="Закат на Угре", technique="oil", genre="landscape", base="Холст на подрамнике", width_cm=120, height_cm=80, year=2025, price=95000,
+    dict(title="Закат на Угре", author="Алексей Громов", technique="oil", genre="landscape", base="Холст на подрамнике", width_cm=120, height_cm=80, year=2025, price=95000,
          art=("landscape", dict(sky=((236, 150, 110), (250, 214, 160)), land=[(120, 90, 90), (80, 60, 64), (50, 40, 44)], sun=(255, 228, 170), water=True))),
 ]
 
 DESCRIPTION = (
-    "Работа написана с натуры и доработана в мастерской. Много воздуха и мягкого света — "
+    "Работа написана с натуры и доработана в мастерской художника. Много воздуха и мягкого света — "
     "картина хорошо смотрится и в светлой гостиной, и в спальне.\n\n"
     "Красочный слой покрыт защитным лаком. Картина готова к развеске."
 )
 
 REVIEWS = [
     ("Ольга", "Купила «Сирень в синей вазе»", "Картина вживую ещё красивее, чем на фото. Упаковано очень бережно, доехала до Москвы за три дня."),
-    ("Андрей и Мария", "Картина на заказ", "Заказывали пейзаж для гостиной под размер стены. Согласовали эскиз, получали фото по ходу работы — результат превзошёл ожидания."),
+    ("Андрей и Мария", "Картина на заказ", "Заказывали пейзаж для гостиной под размер стены. Подобрали художника, согласовали эскиз, получали фото по ходу работы — результат превзошёл ожидания."),
     ("Елена", "Подарок маме", "Выбирала подарок, помогли подобрать по фото комнаты. Мама в восторге, картина висит на самом видном месте."),
 ]
 

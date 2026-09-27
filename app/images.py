@@ -49,12 +49,12 @@ PROFILE_MAX_SIDE = 1200
 
 
 def save_profile_photo(data: bytes) -> str:
-    """Фото автора для сайта: WebP до 1200px. Возвращает имя файла в media/profile/."""
+    """Фото для раздела «О галерее»: WebP до 1200px. Возвращает имя файла в media/profile/."""
     img = ImageOps.exif_transpose(Image.open(BytesIO(data))).convert("RGB")
     img.thumbnail((PROFILE_MAX_SIDE, PROFILE_MAX_SIDE), Image.Resampling.LANCZOS)
     target = settings.media_dir / "profile"
     target.mkdir(parents=True, exist_ok=True)
-    name = f"artist_{secrets.token_hex(6)}.webp"
+    name = f"gallery_{secrets.token_hex(6)}.webp"
     img.save(target / name, "WEBP", quality=85, method=4)
     return name
 

@@ -1,30 +1,36 @@
 {% extends "base.html" %}
 
-{% block title %}{% if f.genre %}{{ GENRES[f.genre] }} — картины{% else %}Картины в наличии{% endif %} — {{ settings.artist_name }}{% endblock %}
+{% block title %}{% if f.genre %}{{ GENRES[f.genre] }} — купить картину{% else %}Каталог картин{% endif %} — {{ settings.site_name }}{% endblock %}
 {% block canonical %}{{ settings.base_url }}/catalog{% endblock %}
 
 {% block content %}
-<div class="container page-head">
-  <nav class="crumbs" aria-label="Навигация"><a href="/">Главная</a><span>/</span>Картины</nav>
-  <h1>Картины</h1>
-</div>
+<header class="page-intro">
+  <div class="container">
+    <nav class="crumbs" aria-label="Навигация"><a href="/">Главная</a><span>/</span>Каталог</nav>
+    <h1>Каталог картин</h1>
+    <p class="lead">Оригиналы в единственном экземпляре. Если нужного размера или сюжета нет — закажем картину у художника.</p>
+  </div>
+</header>
 
 <div class="container">
+  {% if genre_counts %}
+  <nav class="chips" aria-label="Жанры">
+    <a class="chip" href="/catalog" {% if not f.genre %}aria-current="true"{% endif %} data-genre="">Все</a>
+    {% for code, count in genre_counts %}
+    <a class="chip" href="/catalog?genre={{ code }}" {% if f.genre == code %}aria-current="true"{% endif %} data-genre="{{ code }}">{{ GENRES[code] }} <span>{{ count }}</span></a>
+    {% endfor %}
+  </nav>
+  {% endif %}
+
   <form id="filters" class="filters" action="/catalog" method="get"
         hx-get="/catalog" hx-target="#results" hx-push-url="true" hx-indicator="#results"
         hx-trigger="change, submit, input delay:700ms from:.js-money">
+    <input type="hidden" name="genre" value="{{ f.genre }}">
     <label class="field">
       <span>Техника</span>
       <select name="technique">
         <option value="">Любая</option>
         {% for code, label in TECHNIQUES.items() %}<option value="{{ code }}" {% if f.technique == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
-      </select>
-    </label>
-    <label class="field">
-      <span>Жанр</span>
-      <select name="genre">
-        <option value="">Любой</option>
-        {% for code, label in GENRES.items() %}<option value="{{ code }}" {% if f.genre == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
       </select>
     </label>
     <label class="field">

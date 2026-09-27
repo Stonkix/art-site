@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  {% set page_title %}{% block title %}{{ settings.artist_name }} — авторские картины, купить оригинал{% endblock %}{% endset %}
-  {% set page_description %}{% block description %}Оригинальные картины {{ settings.artist_name }}: пейзажи, цветы, натюрморты. Каждая работа в единственном экземпляре, доставка по России, картины на заказ.{% endblock %}{% endset %}
+  {% set page_title %}{% block title %}{{ settings.site_name }} — оригинальные картины, купить в {{ settings.city }}{% endblock %}{% endset %}
+  {% set page_description %}{% block description %}Оригинальные картины современных художников: пейзажи, цветы, натюрморты, абстракция. Каждая работа в единственном экземпляре, доставка по России, картины на заказ.{% endblock %}{% endset %}
   <title>{{ page_title }}</title>
   <meta name="description" content="{{ page_description|trim }}">
   <link rel="canonical" href="{% block canonical %}{{ settings.base_url }}{{ request.url.path }}{% endblock %}">
@@ -31,14 +31,14 @@
   <header class="site-header">
     <div class="container header-row">
       <a class="logo" href="/">
-        <strong>{{ settings.artist_name }}</strong>
-        <small>{{ settings.artist_title }}</small>
+        <strong>{{ settings.site_name }}</strong>
+        <small>{{ settings.site_tagline }}</small>
       </a>
       <nav class="main-nav" id="main-nav" aria-label="Основное меню">
         {% set path = request.url.path %}
-        <a href="/catalog" {% if path.startswith('/catalog') %}aria-current="page"{% endif %}>Картины</a>
+        <a href="/catalog" {% if path.startswith('/catalog') %}aria-current="page"{% endif %}>Каталог</a>
         <a href="/how-to-buy" {% if path == '/how-to-buy' %}aria-current="page"{% endif %}>Покупка и доставка</a>
-        <a href="/about" {% if path == '/about' %}aria-current="page"{% endif %}>Об авторе и контакты</a>
+        <a href="/about" {% if path == '/about' %}aria-current="page"{% endif %}>О галерее</a>
         <a class="nav-phone" href="{{ settings.phone_href }}">{{ settings.phone }}</a>
       </nav>
       <div class="header-actions">
@@ -58,15 +58,15 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>
-        <div class="footer-name">{{ settings.artist_name }}</div>
-        <p class="muted">{{ settings.artist_title }}, {{ settings.city }}.<br>{{ settings.legal_info }}</p>
+        <div class="footer-name">{{ settings.site_name }}</div>
+        <p class="muted">{{ settings.site_tagline }}. {{ settings.city }}, доставка по России.</p>
       </div>
       <div>
         <div class="footer-h">Разделы</div>
-        <a href="/catalog">Картины в наличии</a>
+        <a href="/catalog">Каталог картин</a>
         <a href="/how-to-buy">Покупка и доставка</a>
         <a href="/how-to-buy#commission">Картина на заказ</a>
-        <a href="/about">Об авторе</a>
+        <a href="/about">О галерее</a>
       </div>
       <div>
         <div class="footer-h">Связаться</div>
@@ -77,15 +77,15 @@
       </div>
     </div>
     <div class="container footer-bottom">
-      <span>© {{ now().year }} {{ settings.artist_name }}. Изображения картин защищены авторским правом.</span>
-      <span><a href="/privacy" style="display:inline">Политика конфиденциальности</a></span>
+      <span>© {{ now().year }} {{ settings.site_name }}. Изображения картин защищены авторским правом.</span>
+      <a class="footer-inline" href="/privacy">Политика конфиденциальности</a>
     </div>
   </footer>
 
   <dialog class="lead-dialog" id="lead-dialog" aria-labelledby="lead-dialog-title">
     <button class="dialog-close" type="button" data-close aria-label="Закрыть">×</button>
     <h2 id="lead-dialog-title">Оставьте заявку</h2>
-    <p class="muted" id="lead-dialog-sub">Отвечу в течение дня. Если удобнее — позвоните: {{ settings.phone }}.</p>
+    <p class="muted" id="lead-dialog-sub">Ответим в течение дня. Если удобнее — позвоните: {{ settings.phone }}.</p>
     <div id="lead-dialog-body"></div>
   </dialog>
   <template id="lead-form-tpl">

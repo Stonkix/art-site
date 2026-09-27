@@ -13,7 +13,6 @@ from app import images  # noqa: E402
 from app.db import SessionLocal  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import Lead, Painting, Photo  # noqa: E402
-from app.routes.pages import room_preview  # noqa: E402
 from app.utils import normalize_phone  # noqa: E402
 
 
@@ -27,7 +26,7 @@ def _jpeg(color="red", size=(1200, 900)) -> bytes:
 def client():
     with TestClient(app) as c:
         with SessionLocal() as db:
-            p = Painting(title="Туман над Окой", technique="oil", genre="landscape", base="Холст",
+            p = Painting(title="Туман над Окой", author="Ирина Соколова", technique="oil", genre="landscape", base="Холст",
                          width_cm=60, height_cm=40, price=38000, is_featured=True)
             db.add(p)
             db.add(Painting(title="Проданная", genre="landscape", width_cm=30, height_cm=30, price=9000, status="sold"))
@@ -76,19 +75,11 @@ def test_painting_page(client):
     r = client.get("/catalog/1-tuman", follow_redirects=False)
     assert r.status_code == 301 and r.headers["location"] == "/catalog/1"
     page = client.get("/catalog/1").text
-    assert "VisualArtwork" in page and "_og.jpg" in page and "Примерить в интерьере" in page
+    assert "VisualArtwork" in page and "_og.jpg" in page and "Ирина Соколова" in page
+    assert "Примерить" not in page and "Самозан" not in page
     assert "38\u202f000" in page
     assert client.get("/catalog/4").status_code == 404  # не опубликована
     assert client.get("/contacts", follow_redirects=False).headers["location"] == "/about#contacts"
-
-
-def test_room_preview_fits_large_canvas():
-    k = 16 / 9  # комната 16:9: перевод % ширины в % высоты
-    for w, h in [(60, 40), (100, 150), (200, 40), (20, 20)]:
-        room = room_preview(Painting(width_cm=w, height_cm=h))
-        art_height = room["art_w"] * h / w * k  # высота картины в % высоты комнаты
-        assert room["art_bottom"] + art_height < 100, (w, h)  # картина целиком на стене
-        assert room["art_w"] / room["sofa_w"] == pytest.approx(w / 210, rel=0.01)  # масштаб общий с диваном
 
 
 def test_photo_processing(client):
@@ -119,7 +110,7 @@ def test_lead_and_email(client, monkeypatch):
     assert lead.phone == "+79120001122" and lead.painting_id == 1 and lead.kind == "buy"
     msg = sent[-1]
     assert "Хочу купить картину" in msg["Subject"] and "\n" not in msg["Subject"] and msg["Bcc"] is None
-    assert "«Туман над Окой»" in msg.get_body(("plain",)).get_content()
+    assert "«Туман над Окой», Ирина Соколова" in msg.get_body(("plain",)).get_content()
 
 
 def test_admin_painting_photos(client):
@@ -150,7 +141,7 @@ def test_profile_admin(client):
                     files={"photo": ("me.jpg", _jpeg(size=(800, 1000)), "image/jpeg")}, follow_redirects=False)
     assert r.status_code == 303
     about = client.get("/about").text
-    assert '<p class="lead">Первый абзац.</p>' in about and "/media/profile/artist_" in about
+    assert '<p class="lead">Первый абзац.</p>' in about and "/media/profile/gallery_" in about
 
 
 def test_login_lockout(client):

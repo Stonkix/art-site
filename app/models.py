@@ -42,6 +42,7 @@ class Painting(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(200))
+    author: Mapped[str | None] = mapped_column(String(120), default=None, index=True)  # художник; пусто — не показывается
     technique: Mapped[str] = mapped_column(String(20), default="oil", index=True)
     genre: Mapped[str] = mapped_column(String(20), default="landscape", index=True)
     base: Mapped[str | None] = mapped_column(String(80), default=None)  # холст на подрамнике, картон, бумага…
@@ -177,14 +178,15 @@ class Review(Base):
 
 
 DEFAULT_ABOUT = (
-    "Пишу картины маслом и акрилом: пейзажи, цветы и натюрморты, в которых хочется задержаться взглядом.\n\n"
-    "Каждая работа существует в единственном экземпляре. Отвечу на вопросы, пришлю дополнительные фото "
-    "и помогу подобрать картину под ваш интерьер."
+    "Мы собираем оригинальные картины современных художников: пейзажи, цветы, натюрморты и абстракцию — "
+    "работы, в которых хочется задержаться взглядом.\n\n"
+    "Каждая картина существует в единственном экземпляре. Ответим на вопросы, пришлём дополнительные фото "
+    "и поможем подобрать картину под ваш интерьер."
 )
 
 
 class Profile(Base):
-    """Об авторе — одна строка (id=1), редактируется в админке «Об авторе»."""
+    """О галерее — одна строка (id=1), редактируется в панели управления «О галерее»."""
 
     __tablename__ = "profile"
 
@@ -195,7 +197,7 @@ class Profile(Base):
 
     @property
     def photo_url(self) -> str:
-        return f"/media/profile/{self.photo}" if self.photo else "/static/img/artist.svg"
+        return f"/media/profile/{self.photo}" if self.photo else "/static/img/gallery.svg"
 
     @property
     def paragraphs(self) -> list[str]:

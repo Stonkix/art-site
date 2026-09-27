@@ -33,14 +33,15 @@ def build_lead_email(lead: Lead, painting: Painting | None) -> EmailMessage:
     painting_url = f"{settings.base_url}{painting.url}" if painting else ""
     if painting:
         price = fmt_price(painting.price) if painting.price else "по запросу"
-        rows.append(("Картина", f"«{painting.title}», {painting.size_label}, {price} — {painting_url}"))
+        author = f", {painting.author}" if painting.author else ""
+        rows.append(("Картина", f"«{painting.title}»{author}, {painting.size_label}, {price} — {painting_url}"))
     if lead.message:
         rows.append(("Сообщение", lead.message))
     rows.append(("Время", datetime.now().strftime("%d.%m.%Y %H:%M")))
 
     msg = EmailMessage()
     msg["Subject"] = _one_line(f"Заявка с сайта: {kind} — {lead.name}")
-    msg["From"] = formataddr((f"Сайт {settings.artist_name}", settings.smtp_user))
+    msg["From"] = formataddr((settings.site_name, settings.smtp_user))
     msg["To"] = settings.leads_email_to
     msg.set_content(f"{kind}\n\n" + "\n".join(f"{k}: {v}" for k, v in rows))
 
