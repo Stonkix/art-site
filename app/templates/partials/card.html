@@ -18,7 +18,7 @@
     {% if p.author %}<p class="art-author">{{ p.author }}</p>{% endif %}
     <p class="art-meta">{{ p.medium }} · {{ p.size_label }}</p>
     {% if p.is_sold %}
-    <p class="art-price is-muted">В частной коллекции</p>
+    <p class="art-price is-muted">Уже нашла свой дом</p>
     {% elif p.price %}
     <p class="art-price">{{ p.price|price }}</p>
     {% else %}
