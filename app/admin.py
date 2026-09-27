@@ -81,6 +81,8 @@ def _choices(d: dict[str, str]) -> list[tuple[str, str]]:
 class PaintingAdmin(ModelView, model=Painting):
     name = "Картина"
     name_plural = "Картины"
+    add_label = "Добавить картину"
+    edit_label = "Редактировать картину"
     icon = "fa-solid fa-palette"
     page_size = 50
 
@@ -117,7 +119,10 @@ class PaintingAdmin(ModelView, model=Painting):
         Painting.technique: lambda m, a: m.technique_name,
         Painting.genre: lambda m, a: m.genre_name,
         Painting.status: lambda m, a: STATUSES.get(m.status, m.status),
+        Painting.created_at: lambda m, a: f"{m.created_at:%d.%m.%Y %H:%M}" if m.created_at else "",
+        Painting.updated_at: lambda m, a: f"{m.updated_at:%d.%m.%Y %H:%M}" if m.updated_at else "",
     }
+    column_details_exclude_list = [Painting.photos]  # фото видны в форме редактирования
     column_labels = {
         Painting.title: "Название",
         Painting.author: "Автор",
@@ -134,6 +139,7 @@ class PaintingAdmin(ModelView, model=Painting):
         Painting.is_featured: "На главную",
         Painting.is_published: "Опубликована",
         Painting.created_at: "Добавлена",
+        Painting.updated_at: "Изменена",
         Painting.photos: "Фото",
     }
     form_excluded_columns = [Painting.photos, Painting.created_at, Painting.updated_at]
@@ -147,7 +153,7 @@ class PaintingAdmin(ModelView, model=Painting):
         "status": {
             "choices": _choices(STATUSES),
             "label": "Статус",
-            "description": "Проданные картины уходят из каталога, но остаются на странице «О галерее» в блоке «Уже нашли дом».",
+            "description": "Проданные картины уходят из каталога, но остаются на странице «О галерее» в блоке «Уже нашли свой дом».",
         },
         "description": {"show_chars_count": False},
         # подсказки — только в форме; в таблице заголовки короткие
@@ -227,7 +233,8 @@ class _TermAdmin(ModelView):
     painting_field = ""  # поле Painting, которое ссылается на код
     column_list = ["name", "sort"]
     column_default_sort = [("sort", False), ("name", False)]
-    column_labels = {"name": "Название", "sort": "Порядок (меньше — выше в списках)", "code": "Код в адресе"}
+    column_labels = {"name": "Название", "sort": "Порядок", "code": "Код в адресе"}
+    form_args = {"sort": {"description": "Чем меньше число, тем выше в списках на сайте и в форме картины."}}
     form_columns = ["name", "sort"]
 
     async def on_model_change(self, data: dict, model, is_created: bool, request: Request):
@@ -262,6 +269,8 @@ class _TermAdmin(ModelView):
 class TechniqueAdmin(_TermAdmin, model=Technique):
     name = "Техника"
     name_plural = "Техники"
+    add_label = "Добавить технику"
+    edit_label = "Редактировать технику"
     icon = "fa-solid fa-paintbrush"
     painting_field = "technique"
 
@@ -269,6 +278,8 @@ class TechniqueAdmin(_TermAdmin, model=Technique):
 class GenreAdmin(_TermAdmin, model=Genre):
     name = "Жанр"
     name_plural = "Жанры"
+    add_label = "Добавить жанр"
+    edit_label = "Редактировать жанр"
     icon = "fa-solid fa-tags"
     painting_field = "genre"
 
@@ -276,6 +287,7 @@ class GenreAdmin(_TermAdmin, model=Genre):
 class LeadAdmin(ModelView, model=Lead):
     name = "Заявка"
     name_plural = "Заявки"
+    edit_label = "Заявка"
     icon = "fa-solid fa-envelope"
     can_create = False
 
@@ -299,18 +311,25 @@ class LeadAdmin(ModelView, model=Lead):
 class ReviewAdmin(ModelView, model=Review):
     name = "Отзыв"
     name_plural = "Отзывы"
+    add_label = "Добавить отзыв"
+    edit_label = "Редактировать отзыв"
     icon = "fa-solid fa-comment"
 
     column_list = [Review.author, Review.caption, Review.is_published, Review.created_at]
     column_labels = {
         Review.author: "Автор",
         Review.text: "Текст",
-        Review.caption: "Подпись (например, «Купила „Туман над Окой“»)",
+        Review.caption: "Подпись",
         Review.is_published: "Опубликован",
         Review.created_at: "Дата",
     }
     form_excluded_columns = [Review.created_at]
-    form_args = {"text": {"show_chars_count": False}}
+    form_args = {
+        "text": {"show_chars_count": False},
+        "caption": {"description": "Необязательно. Например: «Купила „Туман над Окой“» или «Картина на заказ»."},
+    }
+    column_formatters = {Review.created_at: lambda m, a: f"{m.created_at:%d.%m.%Y %H:%M}" if m.created_at else ""}
+    column_formatters_detail = column_formatters
 
 
 class ProfileAdmin(BaseView):

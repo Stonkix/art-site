@@ -4,3 +4,19 @@
 {{ super() }}
 <link rel="stylesheet" href="/static/css/admin.css?v={{ static_v }}">
 {% endblock %}
+
+{% block tail %}
+{{ super() }}
+<script>
+  // у обязательных полей sqladmin ставит английскую подсказку
+  $('[title="This is a required field"]').attr("title", "Обязательное поле");
+  // sqladmin пишет подтверждение удаления по-английски — заменяем на русский текст
+  $(document).on("shown.bs.modal", "#modal-delete", function (event) {
+    var el = $(event.relatedTarget);
+    var pk = el.data("pk");
+    $("#modal-delete-text").text(pk
+      ? "Запись «" + el.data("name") + " № " + pk + "» будет удалена безвозвратно. Продолжить?"
+      : "Выбранные записи будут удалены безвозвратно. Продолжить?");
+  });
+</script>
+{% endblock %}

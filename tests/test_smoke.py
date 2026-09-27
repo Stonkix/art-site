@@ -109,7 +109,7 @@ def test_lead_and_email(client, monkeypatch):
         lead = db.query(Lead).order_by(Lead.id.desc()).first()
     assert lead.phone == "+79120001122" and lead.painting_id == 1 and lead.kind == "buy"
     msg = sent[-1]
-    assert "Хочу купить картину" in msg["Subject"] and "\n" not in msg["Subject"] and msg["Bcc"] is None
+    assert "Покупка картины" in msg["Subject"] and "\n" not in msg["Subject"] and msg["Bcc"] is None
     assert "«Туман над Окой», Ирина Соколова" in msg.get_body(("plain",)).get_content()
 
 

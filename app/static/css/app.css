@@ -332,3 +332,10 @@ dialog::backdrop { background: rgb(34 32 28 / 55%); backdrop-filter: blur(2px); 
   .lead-dialog { padding: 24px 18px; }
 }
 .lb-img.is-zoomed { touch-action: none; }  /* в увеличенном виде палец двигает картину, а не страницу */
+
+/* ---------- Telegram ---------- */
+.btn-tg { background: #eaf3fa; color: #1c6aa1; }
+.btn-tg:hover { background: #dcebf7; color: #1c6aa1; }
+.btn-icon { width: 48px; padding: 0; flex: none; }
+.mobile-cta-actions { display: flex; gap: 8px; }
+.dialog-alt { margin: 16px 0 0; text-align: center; font-size: .9rem; color: var(--muted); }

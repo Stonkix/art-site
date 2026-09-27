@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  {% set page_title %}{% block title %}{{ settings.site_name }} — оригинальные картины, купить в {{ settings.city }}{% endblock %}{% endset %}
+  {% set page_title %}{% block title %}{{ settings.site_name }} — оригинальные картины современных художников{% endblock %}{% endset %}
   {% set page_description %}{% block description %}Оригинальные картины современных художников: пейзажи, цветы, натюрморты, абстракция. Каждая работа в единственном экземпляре, доставка по России, картины на заказ.{% endblock %}{% endset %}
   <title>{{ page_title }}</title>
   <meta name="description" content="{{ page_description|trim }}">
@@ -88,6 +88,7 @@
     <h2 id="lead-dialog-title">Оставьте заявку</h2>
     <p class="muted" id="lead-dialog-sub">Ответим в течение дня. Если удобнее — позвоните: {{ settings.phone }}.</p>
     <div id="lead-dialog-body"></div>
+    {% if settings.telegram %}<p class="dialog-alt">Удобнее в мессенджере? <a href="https://t.me/{{ settings.telegram }}" target="_blank" rel="noopener">Напишите в Telegram</a></p>{% endif %}
   </dialog>
   <template id="lead-form-tpl">
     {% with kind="callback", show_message=True %}{% include "partials/lead_form.html" %}{% endwith %}

@@ -1,6 +1,12 @@
 {# Переопределение формы создания sqladmin: одна кнопка «Сохранить» + доп. виджеты формы объекта #}
 {% extends "sqladmin_original/create.html" %}
 
+{% block content %}
+{%- if model_view.add_label is defined -%}
+{{ super()|replace(_("New %(name)s", name=model_view.name), model_view.add_label) }}
+{%- else %}{{ super() }}{% endif -%}
+{% endblock %}
+
 {% block submit_buttons_bottom %}
 <input type="submit" name="save" value="{{ _('Save') }}" class="btn btn-primary">
 {% endblock %}

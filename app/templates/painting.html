@@ -55,6 +55,8 @@
     {% if p.author %}<p class="art-author-lg">{{ p.author }}</p>{% endif %}
     <p class="art-sub">{{ p.subtitle }}</p>
 
+    {# Telegram: открывается чат с уже набранным сообщением про эту картину #}
+    {% set tg_url = "https://t.me/" ~ settings.telegram ~ "?text=" ~ ("Здравствуйте! Интересует картина «" ~ p.title ~ "»: " ~ settings.base_url ~ p.url)|urlencode %}
     <div class="buy-box">
       {% if p.is_sold %}
       <div class="art-price-lg">Продана</div>
@@ -62,6 +64,7 @@
       <div class="art-actions">
         <button class="btn btn-primary btn-block" type="button" data-lead="commission" data-painting="{{ p.id }}"
                 data-title="Похожая картина" data-sub="Подберём работу в том же настроении или закажем у художника под ваш размер.">Хочу похожую</button>
+        {% if settings.telegram %}<a class="btn btn-tg btn-block" href="{{ tg_url }}" target="_blank" rel="noopener">{{ icon('telegram', 18) }}Спросить в Telegram</a>{% endif %}
       </div>
       {% else %}
       <div class="art-price-lg">{% if p.price %}{{ p.price|price }}{% else %}Цена по запросу{% endif %}</div>
@@ -71,6 +74,7 @@
       <div class="art-actions">
         <button class="btn btn-primary btn-block" type="button" data-lead="buy" data-painting="{{ p.id }}"
                 data-title="Хочу эту картину" data-sub="«{{ p.title }}». Свяжемся, ответим на вопросы и расскажем про доставку.">Хочу эту картину</button>
+        {% if settings.telegram %}<a class="btn btn-tg btn-block" href="{{ tg_url }}" target="_blank" rel="noopener">{{ icon('telegram', 18) }}Написать в Telegram</a>{% endif %}
         <div class="art-actions-row">
           <button class="btn btn-ghost" type="button" data-lead="question" data-painting="{{ p.id }}"
                   data-title="Вопрос о картине" data-sub="«{{ p.title }}». Можно попросить дополнительные фото и видео.">Задать вопрос</button>
@@ -122,7 +126,10 @@
 {% if not p.is_sold %}
 <div class="mobile-cta no-print">
   <strong>{% if p.price %}{{ p.price|price }}{% else %}По запросу{% endif %}</strong>
-  <button class="btn btn-primary" type="button" data-lead="buy" data-painting="{{ p.id }}" data-title="Хочу эту картину">Хочу эту картину</button>
+  <div class="mobile-cta-actions">
+    {% if settings.telegram %}<a class="btn btn-tg btn-icon" href="{{ tg_url }}" target="_blank" rel="noopener" aria-label="Написать в Telegram">{{ icon('telegram', 20) }}</a>{% endif %}
+    <button class="btn btn-primary" type="button" data-lead="buy" data-painting="{{ p.id }}" data-title="Хочу эту картину">Хочу эту картину</button>
+  </div>
 </div>
 {% endif %}
 
@@ -131,6 +138,6 @@
   <button class="lb-nav lb-prev" type="button" aria-label="Предыдущее фото">‹</button>
   <div class="lb-stage"><img class="lb-img" alt=""></div>
   <button class="lb-nav lb-next" type="button" aria-label="Следующее фото">›</button>
-  <div class="lb-hint">Нажмите на картину, чтобы приблизить, — и ведите мышью</div>
+  <div class="lb-hint">Нажмите на картину, чтобы приблизить или отдалить</div>
 </dialog>
 {% endblock %}
