@@ -13,6 +13,7 @@ from starlette.datastructures import UploadFile
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from wtforms import MultipleFileField, SelectField
+from wtforms.validators import DataRequired
 
 from app import admin_password, images, login_guard, profile as profile_store, terms
 from app.config import BASE_DIR, settings
@@ -75,7 +76,13 @@ class AdminAuth(AuthenticationBackend):
 
 
 def _choices(d: dict[str, str]) -> list[tuple[str, str]]:
-    return list(d.items())
+    # первым идёт пустой пункт: в новой записи ничего не выбрано заранее, выбрать нужно самому
+    return [("", "— Выберите —"), *d.items()]
+
+
+def _required_select(**kwargs) -> dict:
+    """Аргументы выпадающего списка: пусто по умолчанию (не берём значение из модели) и русская ошибка."""
+    return {"default": "", "validators": [DataRequired(message="Выберите значение из списка")], **kwargs}
 
 
 class PaintingAdmin(ModelView, model=Painting):
@@ -146,15 +153,21 @@ class PaintingAdmin(ModelView, model=Painting):
     form_overrides = {"technique": SelectField, "genre": SelectField, "status": SelectField}
     form_args = {
         # списки берутся из «Справочников» при каждом открытии формы
-        "technique": {"choices": lambda: _choices(terms.get_techniques()), "label": "Техника",
-                      "description": "Нет нужной? Добавьте в «Справочники → Техники»."},
-        "genre": {"choices": lambda: _choices(terms.get_genres()), "label": "Жанр",
-                  "description": "Нет нужного? Добавьте в «Справочники → Жанры»."},
-        "status": {
-            "choices": _choices(STATUSES),
-            "label": "Статус",
-            "description": "Проданные картины уходят из каталога, но остаются на странице «О галерее» в блоке «Уже нашли свой дом».",
-        },
+        "technique": _required_select(
+            choices=lambda: _choices(terms.get_techniques()),
+            label="Техника",
+            description="Нет нужной? Добавьте в «Справочники → Техники».",
+        ),
+        "genre": _required_select(
+            choices=lambda: _choices(terms.get_genres()),
+            label="Жанр",
+            description="Нет нужного? Добавьте в «Справочники → Жанры».",
+        ),
+        "status": _required_select(
+            choices=_choices(STATUSES),
+            label="Статус",
+            description="Проданные картины уходят из каталога, но остаются на странице «О галерее» в блоке «Уже нашли свой дом».",
+        ),
         "description": {"show_chars_count": False},
         # подсказки — только в форме; в таблице заголовки короткие
         "author": {"description": "Необязательно. Если пусто — на сайте не показывается."},

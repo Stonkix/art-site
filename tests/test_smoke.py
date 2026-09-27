@@ -227,3 +227,20 @@ def test_heic_upload(client):
         assert len(p.photos) == 1
         ph = p.photos[0]
     assert Image.open(images.painting_dir(p.id) / f"{ph.name}_full.webp").format == "WEBP"
+
+
+def test_admin_selects_empty_by_default(client):
+    import re
+
+    _login(client)
+    form = client.get("/admin/painting/create").text
+    for field in ("technique", "genre", "status"):
+        select = re.search(rf'<select[^>]*name="{field}"[^>]*>(.*?)</select>', form, re.S).group(1)
+        assert re.search(r'<option selected value="">— Выберите —</option>', select), field  # ничего не выбрано заранее
+    r = client.post("/admin/painting/create", data={"title": "Без техники", "width_cm": "10", "height_cm": "10",
+                                                    "technique": "", "genre": "", "status": "", "save": "Сохранить"})
+    assert "Выберите значение из списка" in r.text
+    with SessionLocal() as db:
+        assert db.query(Painting).filter_by(title="Без техники").count() == 0
+    edit = client.get("/admin/painting/edit/1").text  # у существующей картины — её значение
+    assert re.search(r'<option selected value="oil">', edit)
