@@ -30,9 +30,9 @@ class Settings(BaseSettings):
     site_name: str = "Галерея картин"
     site_tagline: str = "Оригинальные картины"
     city: str = "Калуга"
-    phone: str = "+7 900 000-00-00"
+    phone: str = "+7 920 092-15-55"
     email: str = "hello@example.com"
-    telegram: str = ""  # без @; пусто — ссылка не показывается
+    telegram: str = "moor_la"  # без @; пусто — ссылка не показывается
     max_url: str = ""  # пусто — ссылка на Max не показывается
     yandex_metrika_id: str = ""
 

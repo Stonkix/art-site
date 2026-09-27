@@ -17,7 +17,7 @@
 {% block content %}
 <div class="container page-head">
   <nav class="crumbs" aria-label="Навигация">
-    <a href="/">Главная</a><span>/</span><a href="/catalog">Каталог</a><span>/</span><a href="/catalog?genre={{ p.genre }}">{{ GENRES[p.genre] }}</a>
+    <a href="/">Главная</a><span>/</span><a href="/catalog">Каталог</a><span>/</span><a href="/catalog?genre={{ p.genre }}">{{ p.genre_name }}</a>
   </nav>
 </div>
 
@@ -50,7 +50,7 @@
   </div>
 
   <aside class="art-info">
-    <p class="eyebrow">{{ GENRES[p.genre] }}</p>
+    <p class="eyebrow">{{ p.genre_name }}</p>
     <h1>{{ p.title }}</h1>
     {% if p.author %}<p class="art-author-lg">{{ p.author }}</p>{% endif %}
     <p class="art-sub">{{ p.subtitle }}</p>
@@ -82,7 +82,7 @@
 
     <dl class="specs">
       {% if p.author %}<div><dt>Автор</dt><dd>{{ p.author }}</dd></div>{% endif %}
-      <div><dt>Техника</dt><dd>{{ TECHNIQUES[p.technique] }}</dd></div>
+      <div><dt>Техника</dt><dd>{{ p.technique_name }}</dd></div>
       {% if p.base %}<div><dt>Основа</dt><dd>{{ p.base }}</dd></div>{% endif %}
       <div><dt>Размер</dt><dd>{{ p.size_label }}</dd></div>
       {% if p.year %}<div><dt>Год</dt><dd>{{ p.year }}</dd></div>{% endif %}
@@ -112,7 +112,7 @@
   <div class="container">
     <div class="section-head">
       <h2>Похожие работы</h2>
-      <a class="link-arrow" href="/catalog?genre={{ p.genre }}">{{ GENRES[p.genre] }} — все</a>
+      <a class="link-arrow" href="/catalog?genre={{ p.genre }}">{{ p.genre_name }} — все</a>
     </div>
     <div class="grid-art">{% for p in similar %}{% include "partials/card.html" %}{% endfor %}</div>
   </div>

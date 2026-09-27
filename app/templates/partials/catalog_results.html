@@ -1,5 +1,5 @@
 <div class="results-bar">
-  <span>{% if total %}{{ total }} {{ total|plural('картина', 'картины', 'картин') }}{% if f.genre %} · {{ GENRES[f.genre]|lower }}{% endif %}{% else %}Ничего не найдено{% endif %}</span>
+  <span>{% if total %}{{ total }} {{ total|plural('картина', 'картины', 'картин') }}{% if f.genre %} · {{ genres().get(f.genre, '')|lower }}{% endif %}{% else %}Ничего не найдено{% endif %}</span>
   <button class="btn btn-light btn-sm filters-toggle" type="button" data-filters-toggle>Фильтры</button>
 </div>
 

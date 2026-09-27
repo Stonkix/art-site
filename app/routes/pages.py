@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import get_db
-from app.models import GENRES, SIZE_GROUPS, TECHNIQUES, Painting, Review
+from app.models import SIZE_GROUPS, Painting, Review
+from app.terms import get_genres, get_techniques
 from app.templating import templates
 
 router = APIRouter()
@@ -62,8 +63,8 @@ class CatalogFilters:
         qp = request.query_params
         pick = lambda key, allowed: qp.get(key, "") if qp.get(key, "") in allowed else ""  # noqa: E731
         return cls(
-            technique=pick("technique", TECHNIQUES),
-            genre=pick("genre", GENRES),
+            technique=pick("technique", get_techniques()),
+            genre=pick("genre", get_genres()),
             size=pick("size", SIZE_GROUPS),
             price_max=_int(qp.get("price_max")),
             sold=qp.get("sold") == "1",
@@ -129,7 +130,8 @@ def _genre_counts(db: Session) -> list[tuple[str, int]]:
         .group_by(Painting.genre)
         .order_by(func.count().desc())
     ).all()
-    return [(g, n) for g, n in rows if g in GENRES]
+    genres = get_genres()
+    return [(g, n) for g, n in rows if g in genres]
 
 
 @router.get("/catalog", response_class=HTMLResponse)
@@ -184,7 +186,7 @@ def _artwork_json_ld(p: Painting) -> dict:
         "url": url,
         "description": p.description[:500],
         "artform": "Живопись",
-        "artMedium": TECHNIQUES.get(p.technique, ""),
+        "artMedium": p.technique_name,
         "width": {"@type": "Distance", "name": f"{p.width_cm} см"},
         "height": {"@type": "Distance", "name": f"{p.height_cm} см"},
         "image": [settings.base_url + ph.full for ph in p.photos[:5]],

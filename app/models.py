@@ -5,7 +5,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
 
-TECHNIQUES = {
+# Стартовые значения справочников; дальше их правят в панели управления («Справочники»)
+DEFAULT_TECHNIQUES = {
     "oil": "Масло",
     "acrylic": "Акрил",
     "watercolor": "Акварель",
@@ -14,7 +15,7 @@ TECHNIQUES = {
     "graphics": "Графика",
     "mixed": "Смешанная техника",
 }
-GENRES = {
+DEFAULT_GENRES = {
     "landscape": "Пейзаж",
     "cityscape": "Городской пейзаж",
     "still_life": "Натюрморт",
@@ -98,9 +99,21 @@ class Painting(Base):
         return self.created_at is not None and datetime.now() - self.created_at < timedelta(days=NEW_BADGE_DAYS)
 
     @property
+    def technique_name(self) -> str:
+        from app.terms import get_techniques  # поздний импорт: terms зависит от моделей
+
+        return get_techniques().get(self.technique, self.technique)
+
+    @property
+    def genre_name(self) -> str:
+        from app.terms import get_genres
+
+        return get_genres().get(self.genre, self.genre)
+
+    @property
     def medium(self) -> str:
         """«Масло, холст на подрамнике»."""
-        tech = TECHNIQUES.get(self.technique, "")
+        tech = self.technique_name
         if self.base:
             return f"{tech}, {self.base.lower()}" if tech else self.base
         return tech
@@ -213,3 +226,37 @@ class LoginAttempt(Base):
     failures: Mapped[int] = mapped_column(default=0)
     last_failure_at: Mapped[datetime | None] = mapped_column(default=None)
     blocked_until: Mapped[datetime | None] = mapped_column(default=None)
+
+
+class AdminCredential(Base):
+    """Хеш пароля панели управления после смены в разделе «Смена пароля» (см. app/admin_password.py)."""
+
+    __tablename__ = "admin_credentials"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    password_hash: Mapped[str] = mapped_column(String(200))
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.now, onupdate=datetime.now)
+
+
+class Technique(Base):
+    __tablename__ = "techniques"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(40), unique=True)  # для адресов каталога, задаётся автоматически
+    name: Mapped[str] = mapped_column(String(80))
+    sort: Mapped[int] = mapped_column(default=100)
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Genre(Base):
+    __tablename__ = "genres"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    code: Mapped[str] = mapped_column(String(40), unique=True)
+    name: Mapped[str] = mapped_column(String(80))
+    sort: Mapped[int] = mapped_column(default=100)
+
+    def __str__(self) -> str:
+        return self.name

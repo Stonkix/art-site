@@ -10,6 +10,7 @@ from app import models  # noqa: F401 — регистрирует таблицы
 from app.admin import setup_admin
 from app.config import BASE_DIR, settings
 from app.db import Base, engine
+from app import terms
 from app.routes import leads, pages, seo
 from app.templating import templates
 
@@ -29,6 +30,7 @@ async def lifespan(_app: FastAPI):
         Base.metadata.create_all(engine)
     except OperationalError:
         pass  # при первом запуске соседний воркер uvicorn успел создать таблицы
+    terms.ensure_defaults()
     yield
 
 

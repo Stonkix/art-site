@@ -14,10 +14,10 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from wtforms import MultipleFileField, SelectField
 
-from app import images, login_guard, profile as profile_store
+from app import admin_password, images, login_guard, profile as profile_store, terms
 from app.config import BASE_DIR, settings
 from app.db import SessionLocal, engine
-from app.models import GENRES, LEAD_KINDS, STATUSES, TECHNIQUES, Lead, Painting, Photo, Profile, Review
+from app.models import LEAD_KINDS, STATUSES, Genre, Lead, Painting, Photo, Profile, Review, Technique
 from app.templating import templates as site_templates
 from app.utils import fmt_price
 
@@ -46,9 +46,8 @@ class AdminAuth(AuthenticationBackend):
             )
 
         form = await request.form()
-        ok = _same(form.get("username"), settings.admin_username) & _same(
-            form.get("password"), settings.admin_password
-        )
+        password_ok = await anyio.to_thread.run_sync(admin_password.check, str(form.get("password") or ""))
+        ok = _same(form.get("username"), settings.admin_username) & password_ok
         if not ok:
             await asyncio.sleep(1)  # замедляем перебор пароля
             left, until = login_guard.register_failure(ip)
@@ -63,6 +62,7 @@ class AdminAuth(AuthenticationBackend):
 
         login_guard.reset(ip)
         request.session["admin"] = True
+        request.session["pv"] = admin_password.version()
         return True
 
     async def logout(self, request: Request) -> bool:
@@ -70,7 +70,8 @@ class AdminAuth(AuthenticationBackend):
         return True
 
     async def authenticate(self, request: Request) -> bool:
-        return bool(request.session.get("admin"))
+        # после смены пароля сессии со старой меткой перестают действовать
+        return bool(request.session.get("admin")) and request.session.get("pv") == admin_password.version()
 
 
 def _choices(d: dict[str, str]) -> list[tuple[str, str]]:
@@ -104,13 +105,13 @@ class PaintingAdmin(ModelView, model=Painting):
             if m.cover
             else escape(m.title)
         ),
-        Painting.technique: lambda m, a: TECHNIQUES.get(m.technique, m.technique),
+        Painting.technique: lambda m, a: m.technique_name,
         Painting.status: lambda m, a: STATUSES.get(m.status, m.status),
         Painting.price: lambda m, a: fmt_price(m.price) if m.price else "по запросу",
     }
     column_formatters_detail = {
-        Painting.technique: lambda m, a: TECHNIQUES.get(m.technique, m.technique),
-        Painting.genre: lambda m, a: GENRES.get(m.genre, m.genre),
+        Painting.technique: lambda m, a: m.technique_name,
+        Painting.genre: lambda m, a: m.genre_name,
         Painting.status: lambda m, a: STATUSES.get(m.status, m.status),
     }
     column_labels = {
@@ -134,8 +135,11 @@ class PaintingAdmin(ModelView, model=Painting):
     form_excluded_columns = [Painting.photos, Painting.created_at, Painting.updated_at]
     form_overrides = {"technique": SelectField, "genre": SelectField, "status": SelectField}
     form_args = {
-        "technique": {"choices": _choices(TECHNIQUES), "label": "Техника"},
-        "genre": {"choices": _choices(GENRES), "label": "Жанр"},
+        # списки берутся из «Справочников» при каждом открытии формы
+        "technique": {"choices": lambda: _choices(terms.get_techniques()), "label": "Техника",
+                      "description": "Нет нужной? Добавьте в «Справочники → Техники»."},
+        "genre": {"choices": lambda: _choices(terms.get_genres()), "label": "Жанр",
+                  "description": "Нет нужного? Добавьте в «Справочники → Жанры»."},
         "status": {
             "choices": _choices(STATUSES),
             "label": "Статус",
@@ -206,6 +210,59 @@ class PaintingAdmin(ModelView, model=Painting):
 
     async def after_model_delete(self, model: Painting, request: Request) -> None:
         images.delete_painting_files(model.id)
+
+
+class _TermAdmin(ModelView):
+    """Общая логика справочников: код для адресов создаётся сам, занятое значение удалить нельзя."""
+
+    category = "Справочники"
+    painting_field = ""  # поле Painting, которое ссылается на код
+    column_list = ["name", "sort"]
+    column_default_sort = [("sort", False), ("name", False)]
+    column_labels = {"name": "Название", "sort": "Порядок (меньше — выше в списках)", "code": "Код в адресе"}
+    form_columns = ["name", "sort"]
+
+    async def on_model_change(self, data: dict, model, is_created: bool, request: Request):
+        data["name"] = (data.get("name") or "").strip()
+
+    async def insert_model(self, request: Request, data: dict):
+        # code не входит в форму: создаём запись сами, чтобы сразу выдать уникальный код
+        name = (data.get("name") or "").strip()
+        with SessionLocal() as db:
+            obj = self.model(code=terms.unique_code(db, self.model, name), name=name, sort=data.get("sort") or 100)
+            db.add(obj)
+            db.commit()
+            db.refresh(obj)
+        terms.reset_cache()
+        return obj
+
+    async def after_model_change(self, data: dict, model, is_created: bool, request: Request):
+        terms.reset_cache()
+
+    async def delete_model(self, request: Request, pk):
+        with SessionLocal() as db:
+            term = db.get(self.model, int(pk))
+            used = db.scalar(
+                select(func.count()).select_from(Painting).where(getattr(Painting, self.painting_field) == term.code)
+            )
+        if used:
+            raise ValueError(f"«{term.name}» указан у картин: {used}. Сначала поменяйте его в этих картинах.")
+        await super().delete_model(request, pk)
+        terms.reset_cache()
+
+
+class TechniqueAdmin(_TermAdmin, model=Technique):
+    name = "Техника"
+    name_plural = "Техники"
+    icon = "fa-solid fa-paintbrush"
+    painting_field = "technique"
+
+
+class GenreAdmin(_TermAdmin, model=Genre):
+    name = "Жанр"
+    name_plural = "Жанры"
+    icon = "fa-solid fa-tags"
+    painting_field = "genre"
 
 
 class LeadAdmin(ModelView, model=Lead):
@@ -296,6 +353,28 @@ class ProfileAdmin(BaseView):
             )
 
 
+class PasswordAdmin(BaseView):
+    name = "Смена пароля"
+    icon = "fa-solid fa-key"
+
+    @expose("/password", methods=["GET", "POST"])
+    async def password(self, request: Request):
+        error = None
+        if request.method == "POST":
+            form = await request.form()
+            current, new, repeat = (str(form.get(k, "")) for k in ("current", "new", "repeat"))
+            error = await anyio.to_thread.run_sync(admin_password.validate_new, current, new, repeat)
+            if not error:
+                await anyio.to_thread.run_sync(admin_password.set_password, new)
+                request.session["pv"] = admin_password.version()  # текущая сессия остаётся, остальные — нет
+                return RedirectResponse(request.url.path + "?saved=1", status_code=303)
+        return await self.templates.TemplateResponse(
+            request,
+            "admin/password.html",
+            {"error": error, "saved": request.query_params.get("saved") == "1", "min_length": admin_password.MIN_LENGTH},
+        )
+
+
 def setup_admin(app) -> Admin:
     auth = AdminAuth(secret_key=settings.secret_key, https_only=not settings.debug)
     admin = Admin(
@@ -309,7 +388,8 @@ def setup_admin(app) -> Admin:
     auth.templates = admin.templates
     admin.templates.env.globals["settings"] = settings
     admin.templates.env.globals["static_v"] = site_templates.env.globals["static_v"]
-    for view in (PaintingAdmin, LeadAdmin, ReviewAdmin):
+    for view in (PaintingAdmin, LeadAdmin, ReviewAdmin, TechniqueAdmin, GenreAdmin):
         admin.add_view(view)
     admin.add_base_view(ProfileAdmin)
+    admin.add_base_view(PasswordAdmin)
     return admin

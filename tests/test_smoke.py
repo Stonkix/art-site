@@ -160,3 +160,53 @@ def test_login_lockout(client):
 def test_utils():
     assert normalize_phone("+7 (900) 123-45-67") == "+79001234567"
     assert normalize_phone("12345") is None
+
+
+def test_admin_terms_add_technique(client):
+    _login(client)
+    r = client.post("/admin/technique/create", data={"name": "Карандаш", "sort": "5", "save": "Сохранить"}, follow_redirects=False)
+    assert r.status_code == 302
+    from app.models import Technique
+
+    with SessionLocal() as db:
+        t = db.query(Technique).filter_by(name="Карандаш").one()
+    assert t.code == "karandash"
+    assert '<option value="karandash"' in client.get("/catalog").text  # новая техника — в фильтре каталога
+    assert 'value="karandash"' in client.get("/admin/painting/create").text  # и в форме картины
+
+    with SessionLocal() as db:
+        db.add(Painting(title="Эскиз", technique="karandash", genre="other", width_cm=20, height_cm=30))
+        db.commit()
+    assert "Карандаш" in client.get("/catalog?technique=karandash").text
+
+    # занятую технику удалить нельзя, картины не остаются с «висящим» кодом
+    client.delete("/admin/technique/delete", params={"pks": str(t.id)})
+    with SessionLocal() as db:
+        assert db.get(Technique, t.id) is not None
+
+
+def test_admin_password_change(client):
+    from app import admin_password
+    from app.config import settings
+
+    _login(client)
+    try:
+        bad = client.post("/admin/password", data={"current": "wrong", "new": "новый-пароль-1", "repeat": "новый-пароль-1"})
+        assert "Текущий пароль указан неверно" in bad.text
+        short = client.post("/admin/password", data={"current": settings.admin_password, "new": "123", "repeat": "123"})
+        assert "не короче" in short.text
+        r = client.post("/admin/password", data={"current": settings.admin_password, "new": "новый-пароль-1", "repeat": "новый-пароль-1"},
+                        follow_redirects=False)
+        assert r.status_code == 303
+        assert client.get("/admin/painting/list", follow_redirects=False).status_code == 200  # текущая сессия жива
+
+        other = TestClient(app)  # «другое устройство»: старый пароль больше не подходит
+        assert other.post("/admin/login", data={"username": settings.admin_username, "password": settings.admin_password}).status_code == 400
+        assert other.post("/admin/login", data={"username": settings.admin_username, "password": "новый-пароль-1"},
+                          follow_redirects=False).status_code == 302
+    finally:
+        admin_password.reset()
+        from app import login_guard
+
+        login_guard.reset()
+    _login(client)

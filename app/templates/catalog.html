@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{% if f.genre %}{{ GENRES[f.genre] }} — купить картину{% else %}Каталог картин{% endif %} — {{ settings.site_name }}{% endblock %}
+{% block title %}{% if f.genre %}{{ genres().get(f.genre, '') }} — купить картину{% else %}Каталог картин{% endif %} — {{ settings.site_name }}{% endblock %}
 {% block canonical %}{{ settings.base_url }}/catalog{% endblock %}
 
 {% block content %}
@@ -17,7 +17,7 @@
   <nav class="chips" aria-label="Жанры">
     <a class="chip" href="/catalog" {% if not f.genre %}aria-current="true"{% endif %} data-genre="">Все</a>
     {% for code, count in genre_counts %}
-    <a class="chip" href="/catalog?genre={{ code }}" {% if f.genre == code %}aria-current="true"{% endif %} data-genre="{{ code }}">{{ GENRES[code] }} <span>{{ count }}</span></a>
+    <a class="chip" href="/catalog?genre={{ code }}" {% if f.genre == code %}aria-current="true"{% endif %} data-genre="{{ code }}">{{ genres().get(code, code) }} <span>{{ count }}</span></a>
     {% endfor %}
   </nav>
   {% endif %}
@@ -30,7 +30,7 @@
       <span>Техника</span>
       <select name="technique">
         <option value="">Любая</option>
-        {% for code, label in TECHNIQUES.items() %}<option value="{{ code }}" {% if f.technique == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        {% for code, label in techniques().items() %}<option value="{{ code }}" {% if f.technique == code %}selected{% endif %}>{{ label }}</option>{% endfor %}
       </select>
     </label>
     <label class="field">

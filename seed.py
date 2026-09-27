@@ -10,7 +10,7 @@ from io import BytesIO
 from PIL import Image, ImageChops, ImageDraw, ImageFilter
 from sqlalchemy import delete, select
 
-from app import images
+from app import images, terms
 from app.db import Base, SessionLocal, engine
 from app.models import Lead, Painting, Photo, Review
 
@@ -164,6 +164,7 @@ REVIEWS = [
 
 def main() -> None:
     Base.metadata.create_all(engine)
+    terms.ensure_defaults()  # техники и жанры демо-картин берутся из справочников
     with SessionLocal() as db:
         for pid in db.scalars(select(Painting.id)):
             images.delete_painting_files(pid)

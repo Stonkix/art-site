@@ -6,8 +6,9 @@ from fastapi.templating import Jinja2Templates
 from markupsafe import Markup
 
 from app.config import BASE_DIR, settings
-from app.models import GENRES, LEAD_KINDS, SIZE_GROUPS, STATUSES, TECHNIQUES
+from app.models import LEAD_KINDS, SIZE_GROUPS, STATUSES
 from app.profile import get_profile
+from app.terms import get_genres, get_techniques
 from app.utils import fmt_price
 
 templates = Jinja2Templates(directory=BASE_DIR / "app" / "templates")
@@ -28,8 +29,8 @@ def _plural(n: int, one: str, few: str, many: str) -> str:
 
 templates.env.globals.update(
     settings=settings,
-    TECHNIQUES=TECHNIQUES,
-    GENRES=GENRES,
+    techniques=get_techniques,  # справочники из панели управления
+    genres=get_genres,
     STATUSES=STATUSES,
     SIZE_GROUPS=SIZE_GROUPS,
     LEAD_KINDS=LEAD_KINDS,

@@ -67,7 +67,7 @@
     {% if genre_counts %}
     <div class="genres" style="margin-top:48px">
       {% for code, count in genre_counts %}
-      <a class="genre-link" href="/catalog?genre={{ code }}">{{ GENRES[code] }}<span>{{ count }}</span></a>
+      <a class="genre-link" href="/catalog?genre={{ code }}">{{ genres().get(code, code) }}<span>{{ count }}</span></a>
       {% endfor %}
     </div>
     {% endif %}
